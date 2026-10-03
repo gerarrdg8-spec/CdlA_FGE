@@ -43,10 +43,14 @@ body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--body);font-variant
 h1{font:700 clamp(24px,3.4vw,34px)/1.1 var(--display);margin:8px 0 6px;text-wrap:balance;letter-spacing:-.01em}
 .sub{color:var(--band-muted);margin:0;font-size:14px}
 .sub b{color:var(--band-fg);font-weight:600}
+.sublink{color:inherit;text-decoration:underline;text-decoration-color:var(--band-accent);text-underline-offset:3px}
 
 .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:-18px}
 .kpi{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:16px 18px 14px;display:flex;flex-direction:column;gap:6px;min-width:0}
 .kpi .lab{display:flex;align-items:center;gap:8px;font:600 12px/1 var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.kpi .doc{margin-left:auto;font:600 11px/1 var(--body);letter-spacing:.04em;color:var(--accent);text-decoration:none;border:1px solid currentColor;border-radius:3px;padding:4px 6px}
+.kpi .doc:hover{background:var(--accent);color:var(--surface)}
+.kpi .doc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .kpi .val{font:700 clamp(22px,2.8vw,30px)/1.1 var(--display);letter-spacing:-.01em}
 .kpi .note{font-size:13px;color:var(--muted)}
 .sw{width:12px;height:12px;border-radius:3px;flex:none}
@@ -83,6 +87,10 @@ td.pvc,th.pvc{background:color-mix(in srgb,var(--accent) 6%,transparent);border-
 
 tr.fase td{background:var(--surface-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding-block:12px}
 tr.fase:first-child td{border-top:0}
+tr.fase{cursor:pointer}
+tr.fase:hover td{background:var(--line-2)}
+tr.fase:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+tr.fase[aria-expanded="true"] .chev{transform:rotate(90deg)}
 .fname{display:flex;align-items:center;gap:10px;font:700 16px/1.2 var(--display)}
 .fname i{width:4px;height:20px;border-radius:2px;display:block}
 .fname small{font:500 12px var(--body);color:var(--muted)}
@@ -153,7 +161,7 @@ tfoot .t-cost td.pvc{background:var(--line)}
 <main class="wrap">
   <section class="kpis" aria-label="Totals">
     <div class="kpi">
-      <div class="lab"><span class="sw nx"></span>Avantprojecte Nexxo</div>
+      <div class="lab"><span class="sw nx"></span>Avantprojecte Nexxo <a class="doc" id="k-nx-doc" href="docs/Nexxo-CdlA-pre-estudi-costos-fases.pdf" target="_blank" rel="noopener" title="Obre el document de Nexxo (PDF)">PDF ↗</a></div>
       <div class="val" id="k-nx">0 €</div>
       <div class="note" id="k-nx-n">0 partides</div>
     </div>
@@ -210,7 +218,7 @@ tfoot .t-cost td.pvc{background:var(--line)}
   <div class="foot">
     <p>Desviació = Factura real − Nexxo. En vermell ▲ quan la factura supera el previst; en blau ▼ quan queda per sota. Les partides sense factura surten com a <span class="pill pend">Pendent</span> (dins de cada industrial) i no entren al càlcul de la desviació. <span class="pill cost">No industrial</span> = cost del document que no és d'obra.</p>
     <p>Previsió = la xifra que fixem nosaltres per a cada partida. No surt de cap document. Les partides sense previsió no hi sumen.</p>
-    <p>Les files van sense IVA, com el document de Nexxo. Al peu, igual que al document: contingències del 10 %, total obra, IVA 21 % i <b>total costos</b>, que és el que paga la Fundació perquè no pot deduir l'IVA. L'ICIO no porta IVA. Les xifres de dalt són amb IVA. Clica un industrial per veure'n les partides.</p>
+    <p>Les files van sense IVA, com el document de Nexxo. Al peu, igual que al document: contingències del 10 %, total obra, IVA 21 % i <b>total costos</b>, que és el que paga la Fundació perquè no pot deduir l'IVA. L'ICIO no porta IVA. Les xifres de dalt són amb IVA. Clica una fase per recollir-la o desplegar-la, i un industrial per veure'n les partides.</p>
   </div>
 </main>
 
@@ -502,6 +510,7 @@ const cellNum = (v, buit) => buit ? `<span class="zero">—</span>` : `<span cla
 
 let filtre = 0;
 const oberts = new Set();
+const fasesTancades = new Set();
 try{ filtre = +(localStorage.getItem("rnx-filtre")||0) }catch(e){}
 
 function render(){
@@ -523,7 +532,7 @@ function render(){
 
   if(PROJECTE.nom) document.getElementById("titol").textContent = PROJECTE.nom;
   const sub = [];
-  if(PROJECTE.nexxoDoc) sub.push(`Nexxo: <b>${esc(PROJECTE.nexxoDoc)}</b>`);
+  if(PROJECTE.nexxoDoc) sub.push(`Nexxo: <a class="sublink" href="docs/Nexxo-CdlA-pre-estudi-costos-fases.pdf" target="_blank" rel="noopener"><b>${esc(PROJECTE.nexxoDoc)}</b> ↗</a>`);
   if(PROJECTE.facturaDocs.length) sub.push(`Factures: <b>${PROJECTE.facturaDocs.map(esc).join(", ")}</b>`);
   if(sub.length) document.getElementById("subtitol").innerHTML = sub.join(" · ");
 
@@ -537,8 +546,10 @@ function render(){
     if(filtre && f.id!==filtre) continue;
     const pf = PARTIDES.filter(p=>p.fase===f.id);
     const sf = suma(pf);
-    h += `<tr class="fase"><td><div class="fname"><i style="background:${fcol(f.id)}"></i>${f.nom}${f.desc?` <small>${esc(f.desc)}</small>`:""}</div></td>
+    const tancada = fasesTancades.has(f.id);
+    h += `<tr class="fase" tabindex="0" data-f="${f.id}" aria-expanded="${!tancada}" title="${tancada?"Desplega":"Recull"} ${f.nom}"><td><div class="fname"><svg class="chev" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><i style="background:${fcol(f.id)}"></i>${f.nom}${f.desc?` <small>${esc(f.desc)}</small>`:""}</div></td>
       <td class="num">${cellNum(sf.nx, !sf.n)}</td><td class="pvc">${cellPv(sf)}</td><td class="num">${cellNum(sf.rf, !sf.nr)}</td><td>${cellDv(sf)}</td></tr>`;
+    if(tancada) continue;
     for(const ind of INDUSTRIALS){
       const pi = pf.filter(p=>p.ind===ind.id);
       if(ind.tipus!=="base" && !pi.length) continue;
@@ -574,9 +585,15 @@ document.getElementById("filtre").addEventListener("click", e=>{
   try{ localStorage.setItem("rnx-filtre", filtre) }catch(e){}
   render();
 });
-function toggle(row){ const k=row.dataset.k; oberts.has(k)?oberts.delete(k):oberts.add(k); render(); }
-document.getElementById("cos").addEventListener("click", e=>{ const r=e.target.closest(".ind-row"); if(r) toggle(r); });
-document.getElementById("cos").addEventListener("keydown", e=>{ const r=e.target.closest(".ind-row"); if(r && (e.key==="Enter"||e.key===" ")){ e.preventDefault(); toggle(r); const n=document.querySelector(`.ind-row[data-k="${r.dataset.k}"]`); n&&n.focus(); } });
+function toggle(row){
+  if(row.classList.contains("fase")){ const f=+row.dataset.f; fasesTancades.has(f)?fasesTancades.delete(f):fasesTancades.add(f); }
+  else { const k=row.dataset.k; oberts.has(k)?oberts.delete(k):oberts.add(k); }
+  render();
+}
+const fila = e => e.target.closest(".ind-row, tr.fase");
+const sel = r => r.classList.contains("fase") ? `tr.fase[data-f="${r.dataset.f}"]` : `.ind-row[data-k="${r.dataset.k}"]`;
+document.getElementById("cos").addEventListener("click", e=>{ const r=fila(e); if(r) toggle(r); });
+document.getElementById("cos").addEventListener("keydown", e=>{ const r=fila(e); if(r && (e.key==="Enter"||e.key===" ")){ e.preventDefault(); const q=sel(r); toggle(r); const n=document.querySelector(q); n&&n.focus(); } });
 render();
 </script>
 
