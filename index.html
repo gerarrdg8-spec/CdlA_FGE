@@ -165,6 +165,9 @@ tr.fase .num{font:700 15px var(--display)}
 .zero{color:var(--faint)}
 .num{font-weight:500}
 .pill{display:inline-block;font:600 11px/1 var(--body);padding:4px 7px;border-radius:999px;letter-spacing:.02em}
+.pill.fac{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent)}
+.src-n{display:block;font-size:12px;color:var(--faint)}
+tr.det.fac td{background:color-mix(in srgb,var(--accent) 5%,transparent)}
 .pill.pend{background:var(--pend-bg);color:var(--pend)}
 .pill.prop{background:color-mix(in srgb,var(--f2) 14%,transparent);color:var(--f2)}
 .pill.cost{background:var(--line-2);color:var(--muted)}
@@ -217,7 +220,7 @@ tfoot .t-cost td.pvc{background:var(--line)}
   <div class="wrap">
     <div class="eyebrow">Fundació GironaEst · Quadre de comandament</div>
     <h1 id="titol">Reforma Global Casa de les Arts</h1>
-    <p class="actual" id="actual">Dades actualitzades el 03/10/2026 a les 18:04</p>
+    <p class="actual" id="actual">Dades actualitzades el 03/10/2026 a les 18:06</p>
   </div>
 </header>
 
@@ -272,8 +275,10 @@ tfoot .t-cost td.pvc{background:var(--line)}
       <div class="ent-grid">
         <label>Fase<select id="ent-fase"></select></label>
         <label>Industrial<select id="ent-ind"></select></label>
-        <label class="ample">Partida de Nexxo<select id="ent-linia"></select><small id="ent-linia-n"></small></label>
+        <label class="ample" data-per="previsio material hores">Partida de Nexxo<select id="ent-linia"></select><small id="ent-linia-n"></small></label>
         <label data-per="factura previsio material" id="ent-import-l"><span id="ent-import-t">Import sense IVA (€)</span><input id="ent-import" inputmode="decimal" placeholder="0,00" autocomplete="off"></label>
+        <label data-per="factura">IVA<select id="ent-iva"><option value="0.21">21 %</option><option value="0.10">10 %</option><option value="0">Sense IVA</option></select></label>
+        <label data-per="factura" class="ample"><span>&nbsp;</span><small id="ent-ind-n"></small></label>
         <label data-per="hores">Hores<input id="ent-hores" inputmode="decimal" placeholder="0" autocomplete="off"></label>
         <label data-per="hores">Preu per hora (€)<input id="ent-preu" inputmode="decimal" placeholder="0,00" autocomplete="off"></label>
         <label data-per="factura material hores"><span id="ent-qui-t">Proveïdor</span><input id="ent-qui" autocomplete="off"></label>
@@ -340,7 +345,7 @@ tfoot .t-cost td.pvc{background:var(--line)}
     </div>
     <div class="clau-item">
       <h3>Etiquetes</h3>
-      <p><span class="pill pend">Pendent</span> partida sense factura: no entra al càlcul de la desviació.</p>
+      <p><span class="pill fac">Factura</span> una per industrial i fase, no per partida. Un industrial sense factura no entra a la desviació.</p>
       <p><span class="pill cost">No industrial</span> cost del document que no és d'obra.</p>
     </div>
   </section>
@@ -567,7 +572,8 @@ const INDUSTRIALS = [
 
 /* Previsió i factura real, per id de línia de Nexxo: { "n12": 1234.56, ... } — imports SENSE IVA (l'IVA s'afegeix al tancament) */
 const PREVISIONS = {};
-const FACTURES = {};
+/* Factures reals: una per industrial i fase, no per partida. { fase, ind, import (sense IVA), iva, qui, ref, data } */
+const FACTURES = [];
 /* Aportacions en espècie (sense IVA): material donat al seu valor de mercat, o hores de voluntariat × preu/hora */
 const ESPECIE = {
   /* n12: { tipus: "material", valor: 1500, qui: "Empresa X", nota: "Què s'ha donat", doc: "albarà / certificat" },
@@ -586,22 +592,20 @@ const IVA_GENERAL = 0.21;
 const CONTINGENCIES = {};   // per fase, sense IVA
 NEXXO.filter(l => l.i === "contingencies").forEach(l => CONTINGENCIES[l.f] = (CONTINGENCIES[l.f]||0) + l.b);
 const LINIES = NEXXO.filter(l => l.i !== "contingencies");
-let PARTIDES = [];
+let PARTIDES = [], FAC = [];
 function construeix(){
   const per = {};
-  for(const e of ENTRADES){ (per[e.linia] ||= []).push(e); }
+  for(const e of ENTRADES){ if(e.linia) (per[e.linia] ||= []).push(e); }
+  FAC = FACTURES.concat(ENTRADES.filter(e=>e.tipus==="factura" && e.fase && e.ind))
+    .map(f=>({...f, fase:+f.fase, iva: f.iva==null ? IVA_GENERAL : +f.iva, import: +f.import||0}));
   PARTIDES = LINIES.map(l => {
     const es = per[l.id] || [];
-    const fac = es.filter(e=>e.tipus==="factura");
     const prev = es.filter(e=>e.tipus==="previsio").sort((a,b)=>(b.creat||0)-(a.creat||0))[0];
     const esp = [].concat(ESPECIE[l.id]||[]).concat(es.filter(e=>e.tipus==="material"||e.tipus==="hores")
       .map(e=>({tipus:e.tipus, valor:e.import, hores:e.hores, preuHora:e.preuHora, qui:e.qui, nota:e.nota})));
-    const facBase = FACTURES[l.id] ?? null;
     return {
       id: l.id, fase: l.f, ind: l.i, concepte: l.c, base: l.b, iva: l.v, nexxo: l.b,
       previsio: prev ? prev.import : (PREVISIONS[l.id] ?? null),
-      factura: fac.length || facBase!=null ? (facBase||0) + fac.reduce((a,e)=>a+(e.import||0),0) : null,
-      factures: fac,
       esp: esp.length ? esp : null,
       font: `${l.k !== "—" ? l.k + " · " : ""}${l.cap} · pàg. ${l.p}${l.v === 0 ? " · sense IVA" : ""}`,
     };
@@ -616,28 +620,37 @@ const pct = n => (n>0?"+":"") + new Intl.NumberFormat("ca-ES",{maximumFractionDi
 const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const fcol = f => `var(--f${f})`;
 
+/* Les factures van per industrial i fase: la desviació es calcula per grup (fase|industrial),
+   factures del grup − Nexxo del grup, sense les partides cobertes amb aportacions en espècie. */
 function suma(list){
-  let nx=0, rf=0, rfComp=0, nxComp=0, pend=0, n=list.length, nr=0, nc=0, pv=0, np=0, es=0, esMat=0, esHores=0, hores=0, ne=0;
+  let nx=0, rf=0, ivRf=0, rfComp=0, nxComp=0, pend=0, n=list.length, nc=0, nfac=0, pv=0, np=0, es=0, esMat=0, esHores=0, hores=0, ne=0;
+  const grups = {};
   for(const p of list){
     nx += p.nexxo||0;
     if(p.previsio!=null){ pv += p.previsio; np++; }
-    if(p.esp){ ne++; for(const x of p.esp){ const v=valorEsp(x); es+=v; if(x.tipus==="hores"){ esHores+=v; hores+=x.hores||0; } else esMat+=v; } }
-    if(p.factura==null){ pend += p.nexxo||0; }
-    else { rf += p.factura; nr++; if(!p.esp){ rfComp += p.factura; nxComp += p.nexxo||0; nc++; } }
+    const g = grups[p.fase+"|"+p.ind] ||= { nx:0, nxEsp:0 };
+    g.nx += p.nexxo||0;
+    if(p.esp){ ne++; g.nxEsp += p.nexxo||0; for(const x of p.esp){ const v=valorEsp(x); es+=v; if(x.tipus==="hores"){ esHores+=v; hores+=x.hores||0; } else esMat+=v; } }
   }
-  const dv = rfComp - nxComp;   // les partides amb aportació en espècie no es comparen
-  return { nx, rf, nxComp, pend, n, nr: nc, nfac: nr, dv, pv, np, es, esMat, esHores, hores, ne, dvPct: nxComp ? dv/nxComp*100 : null };
+  for(const [k,g] of Object.entries(grups)){
+    const fs = FAC.filter(f=>f.fase+"|"+f.ind===k);
+    if(!fs.length){ pend += g.nx; continue; }
+    const t = fs.reduce((a,f)=>a+f.import,0);
+    rf += t; ivRf += fs.reduce((a,f)=>a+f.import*f.iva,0); nfac += fs.length;
+    rfComp += t; nxComp += g.nx - g.nxEsp; nc++;
+  }
+  const dv = rfComp - nxComp;
+  return { nx, rf, ivRf, nxComp, pend, n, nr: nc, nfac, dv, pv, np, es, esMat, esHores, hores, ne, dvPct: nxComp ? dv/nxComp*100 : null };
 }
 
 /* Tancament com al document: obra + contingències = total obra; + IVA = total costos */
 function tancament(list, fases){
   const s = suma(list);
   const cont = fases.reduce((a,f)=>a+(CONTINGENCIES[f]||0),0);
-  let ivNx = cont*IVA_GENERAL, ivPv = 0, ivRf = 0;
+  let ivNx = cont*IVA_GENERAL, ivPv = 0, ivRf = s.ivRf;
   for(const p of list){
     ivNx += (p.nexxo||0)*p.iva;
     if(p.previsio!=null) ivPv += p.previsio*p.iva;
-    if(p.factura!=null)  ivRf += p.factura*p.iva;
   }
   return { s, cont,
     obra: { nx: s.nx+cont, pv: s.pv, rf: s.rf },
@@ -683,7 +696,7 @@ function render(){
   document.getElementById("k-es-bar").innerHTML = tot.es ? `<span class="m" style="flex:${tot.esMat}"></span><span class="h" style="flex:${tot.esHores}"></span>` : "";
   document.getElementById("k-es-n").innerHTML = tot.ne ? `Material ${eur(tot.esMat)} · Voluntariat ${eur(tot.esHores)} (${tot.hores} h)<br>Sense IVA · no entren a la desviació` : "Material donat i hores de voluntariat, valorats sense IVA";
   document.getElementById("k-rf").textContent = eur(T.cost.rf);
-  document.getElementById("k-rf-n").textContent = `${tot.nfac} de ${tot.n} partides facturades` + (tot.pend? ` · ${eur(tot.pend)} pendents` : "");
+  document.getElementById("k-rf-n").textContent = `${tot.nfac} ${tot.nfac===1?"factura":"factures"}` + (tot.pend? ` · ${eur(tot.pend)} de Nexxo encara sense facturar` : "");
   const kdv = document.getElementById("k-dv");
   kdv.className = "val " + (tot.dv>0?"over":tot.dv<0?"under":"");
   kdv.textContent = tot.nr ? `${tot.dv>0?"+":""}${eur(tot.dv)}` : "—";
@@ -715,11 +728,14 @@ function render(){
       const cmp = s.n ? `<div class="cmp" aria-hidden="true"><div class="n" style="width:${s.nx/maxInd*100}%"></div><div class="r" style="width:${s.rf/maxInd*100}%"></div></div>` : "";
       h += `<tr class="ind-row" tabindex="0" data-k="${key}" aria-expanded="${obert}">
         <td><div class="ind-name"><svg class="chev" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>${ind.nom} <span class="cnt">${s.n?`· ${s.n}`:""}</span>${ind.tipus==="cost"?` <span class="pill cost">No industrial</span>`:""}</div>${cmp}</td>
-        <td>${cellNum(s.nx, !s.n)}</td><td class="pvc">${cellPv(s)}</td><td>${cellNum(s.rf, !s.nfac)}${s.es?`<span class="esp">+ ${eur(s.es)} en espècie</span>`:""}</td><td>${cellDv(s)}</td></tr>`;
+        <td>${cellNum(s.nx, !s.n)}</td><td class="pvc">${cellPv(s)}</td><td>${cellNum(s.rf, !s.nfac)}${s.nfac?`<span class="src-n">${s.nfac} ${s.nfac>1?"factures":"factura"}</span>`:""}${s.es?`<span class="esp">+ ${eur(s.es)} en espècie</span>`:""}</td><td>${cellDv(s)}</td></tr>`;
+      if(obert) for(const fc of FAC.filter(x=>x.fase===f.id&&x.ind===ind.id)){
+        h += `<tr class="det fac"><td><span class="pill fac">Factura</span> ${esc([fc.ref,fc.qui].filter(Boolean).join(" · ")||"Sense número")}<span class="src">${esc([fc.data,fc.nota,fc.iva!==IVA_GENERAL?`IVA ${Math.round(fc.iva*100)} %`:""].filter(Boolean).join(" · "))}</span></td>
+          <td></td><td class="pvc"></td><td><b>${eur2(fc.import)}</b></td><td></td></tr>`;
+      }
       if(obert) for(const p of pi){
-        const sp = suma([p]);
         h += `<tr class="det"><td>${esc(p.concepte)}${p.font?`<span class="src">${esc(p.font)}</span>`:""}</td>
-          <td>${eur(p.nexxo||0)}</td><td class="pvc">${p.previsio==null?`<span class="zero">—</span>`:eur(p.previsio)}</td><td>${p.factura==null?`<span class="pill pend">Pendent</span>`:eur(p.factura)}${p.factures.length?`<span class="src">${p.factures.map(f=>esc([f.qui,f.ref].filter(Boolean).join(" · "))).filter(Boolean).join("<br>")}</span>`:""}${(p.esp||[]).map(x=>`<span class="esp">+ ${eur(valorEsp(x))} ${x.tipus==="hores"?`<span class="pill vol">Voluntariat · ${x.hores} h × ${x.preuHora} €</span>`:`<span class="pill mat">Material donat</span>`}</span><span class="src">${esc([x.qui,x.nota].filter(Boolean).join(" · "))}</span>`).join("")}</td><td>${p.esp?`<span class="zero" title="Té aportació en espècie: no es compara">no es compara</span>`:cellDv(sp)}</td></tr>`;
+          <td>${eur(p.nexxo||0)}</td><td class="pvc">${p.previsio==null?`<span class="zero">—</span>`:eur(p.previsio)}</td><td>${(p.esp||[]).map(x=>`<span class="esp">+ ${eur(valorEsp(x))} ${x.tipus==="hores"?`<span class="pill vol">Voluntariat · ${x.hores} h × ${x.preuHora} €</span>`:`<span class="pill mat">Material donat</span>`}</span><span class="src">${esc([x.qui,x.nota].filter(Boolean).join(" · "))}</span>`).join("")}</td><td>${p.esp?`<span class="zero" title="Té aportació en espècie: no es compara">no es compara</span>`:""}</td></tr>`;
       }
     }
   }
@@ -780,9 +796,14 @@ function omplirLinia(){
   $("ent-linia").innerHTML = LINIES.filter(l=>l.f===f&&l.i===ind).map(l=>`<option value="${l.id}">${esc(l.k)} · ${esc(l.c)}</option>`).join("");
   infoLinia();
 }
+function infoInd(){
+  const f=+$("ent-fase").value, ind=$("ent-ind").value, s=suma(PARTIDES.filter(p=>p.fase===f&&p.ind===ind));
+  $("ent-ind-n").textContent = `Nexxo ${indNom(ind)} fase ${f}: ${eur2(s.nx)} sense IVA` + (s.nfac?` · ja facturat ${eur2(s.rf)} en ${s.nfac} ${s.nfac>1?"factures":"factura"}`:"");
+}
 function infoLinia(){
+  infoInd();
   const p = PARTIDES.find(x=>x.id===$("ent-linia").value);
-  $("ent-linia-n").textContent = p ? `Nexxo ${eur2(p.nexxo)} sense IVA` + (p.factura!=null?` · ja facturat ${eur2(p.factura)}`:"") + (p.previsio!=null?` · previsió ${eur2(p.previsio)}`:"") : "";
+  $("ent-linia-n").textContent = p ? `Nexxo ${eur2(p.nexxo)} sense IVA` + (p.previsio!=null?` · previsió ${eur2(p.previsio)}`:"") : "";
   calc();
 }
 function posaTipus(t){
@@ -797,15 +818,17 @@ function posaTipus(t){
 function calc(){
   const t=tipus, out=$("ent-calc");
   if(t==="hores"){ const h=num($("ent-hores").value), pr=num($("ent-preu").value); out.innerHTML = h&&pr ? `Valor: <b>${eur2(h*pr)}</b> (${h} h × ${eur2(pr)})` : ""; }
-  else if(t==="factura"){ const v=num($("ent-import").value), p=PARTIDES.find(x=>x.id===$("ent-linia").value); out.innerHTML = v!=null&&p ? `Amb IVA: <b>${eur2(v*(1+p.iva))}</b>` + (p.iva===0?" (sense IVA)":"") : ""; }
+  else if(t==="factura"){ const v=num($("ent-import").value), iv=+$("ent-iva").value; out.innerHTML = v!=null ? `Amb IVA: <b>${eur2(v*(1+iv))}</b>` : ""; }
   else out.innerHTML = "";
 }
 async function desa(e){
   e.preventDefault();
   const err = $("ent-err"); err.textContent = "";
-  const linia = $("ent-linia").value;
-  if(!linia){ err.textContent = "Tria una partida."; return; }
-  const d = { tipus, linia, nota: $("ent-nota").value.trim(), creat: Date.now() };
+  const linia = $("ent-linia").value, fase = +$("ent-fase").value, ind = $("ent-ind").value;
+  if(tipus!=="factura" && !linia){ err.textContent = "Tria una partida."; return; }
+  if(tipus==="factura" && !ind){ err.textContent = "Tria l'industrial."; return; }
+  const d = tipus==="factura" ? { tipus, fase, ind, iva: +$("ent-iva").value, nota: $("ent-nota").value.trim(), creat: Date.now() }
+                              : { tipus, linia, nota: $("ent-nota").value.trim(), creat: Date.now() };
   if(tipus==="hores"){
     d.hores = num($("ent-hores").value); d.preuHora = num($("ent-preu").value);
     if(!d.hores || d.hores<=0){ err.textContent = "Escriu quantes hores."; return; }
@@ -822,7 +845,7 @@ async function desa(e){
     if(tipus==="previsio") await DB.collection("entrades").doc("prev-"+linia).set(d);
     else await DB.collection("entrades").add(d);
     ["ent-import","ent-hores","ent-ref","ent-nota"].forEach(id=>$(id).value="");
-    toast(`Desat: ${TIPUS[tipus]} · ${nomLinia(linia)}`);
+    toast(`Desat: ${TIPUS[tipus]} · ${tipus==="factura" ? indNom(ind)+" · Fase "+fase : nomLinia(linia)}`);
   }catch(x){
     err.textContent = x && x.code==="invalid_argument" ? "No tens permís per desar dades en aquest quadre. Demana a qui el comparteix que et doni accés de Col·laborador." : "No s'ha pogut desar. Torna-ho a provar d'aquí a un moment.";
   }finally{ btn.disabled = false; }
@@ -831,11 +854,11 @@ function pintaLlista(){
   const ll = [...ENTRADES].sort((a,b)=>(b.creat||0)-(a.creat||0));
   $("ent-n").textContent = ll.length ? `· ${ll.length}` : "";
   $("ent-cos").innerHTML = ll.length ? ll.map(e=>`<tr><td>${esc(e.data||new Date(e.creat||0).toISOString().slice(0,10))}</td><td>${TIPUS[e.tipus]||esc(e.tipus)}</td>
-    <td>${esc(nomLinia(e.linia))}<span class="src">${esc(indNom((LINIES.find(l=>l.id===e.linia)||{}).i))} · Fase ${(LINIES.find(l=>l.id===e.linia)||{}).f||"?"}</span></td>
+    <td>${e.tipus==="factura" ? `${esc(indNom(e.ind))}<span class="src">Fase ${e.fase} · tot l'industrial</span>` : `${esc(nomLinia(e.linia))}<span class="src">${esc(indNom((LINIES.find(l=>l.id===e.linia)||{}).i))} · Fase ${(LINIES.find(l=>l.id===e.linia)||{}).f||"?"}</span>`}</td>
     <td>${esc([e.qui,e.ref].filter(Boolean).join(" · ")||"—")}${e.nota?`<span class="src">${esc(e.nota)}</span>`:""}</td>
     <td>${eur2(e.import||0)}${e.tipus==="hores"?`<span class="src">${e.hores} h × ${eur2(e.preuHora)}</span>`:""}</td>
     <td><button type="button" class="esb" data-id="${esc(e._id)}" aria-label="Esborra aquesta entrada">×</button></td></tr>`).join("")
-    : `<tr><td colspan="6" class="zero">Encara no hi ha cap entrada. Tria què entres, la partida i l'import, i prem Desa.</td></tr>`;
+    : `<tr><td colspan="6" class="zero">Encara no hi ha cap entrada. Tria què entres, on va i l'import, i prem Desa.</td></tr>`;
 }
 let tTimer;
 function toast(m){ let t=document.querySelector(".toast"); if(!t){ t=document.createElement("div"); t.className="toast"; t.setAttribute("role","status"); document.body.appendChild(t);} t.textContent=m; t.hidden=false; clearTimeout(tTimer); tTimer=setTimeout(()=>t.hidden=true,3000); }
@@ -849,6 +872,7 @@ $("ent-cos").addEventListener("click", async e=>{
 $("ent-tipus").addEventListener("click", e=>{ const b=e.target.closest("button"); if(b) posaTipus(b.dataset.t); });
 $("ent-fase").addEventListener("change", omplirInd);
 $("ent-ind").addEventListener("change", omplirLinia);
+$("ent-iva").addEventListener("change", calc);
 $("ent-linia").addEventListener("change", infoLinia);
 ["ent-import","ent-hores","ent-preu"].forEach(id=>$(id).addEventListener("input", calc));
 $("ent-form").addEventListener("submit", desa);
@@ -862,7 +886,7 @@ $("ent-tanca").addEventListener("click", ()=>{ $("entrada").hidden=true; $("ent-
   const pot = user ? await user.can("data.write") : null;
   DB = db;
   db.collection("entrades").onSnapshot(snap => {
-    ENTRADES = snap.docs.map(d => ({ _id: d.id, ...d.data() })).filter(e => LINIES.some(l=>l.id===e.linia));
+    ENTRADES = snap.docs.map(d => ({ _id: d.id, ...d.data() })).filter(e => e.tipus==="factura" ? (e.fase && e.ind) : LINIES.some(l=>l.id===e.linia));
     construeix(); render(); pintaLlista(); infoLinia();
   }, () => {});
   if(pot === false) return;   // només lectura
