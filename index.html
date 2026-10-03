@@ -39,6 +39,7 @@
 body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--body);font-variant-numeric:tabular-nums}
 .band{background:var(--band);color:var(--band-fg);padding-block:26px 20px}
 .wrap{max-width:1180px;margin:0 auto;padding-inline:16px}
+.actual{margin:6px 0 0;font-size:13px;color:var(--muted)}
 .eyebrow{font:600 11px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--band-accent)}
 h1{font:700 clamp(24px,3.4vw,34px)/1.1 var(--display);margin:8px 0 6px;text-wrap:balance;letter-spacing:-.01em}
 .sub{color:var(--band-muted);margin:0;font-size:14px}
@@ -85,6 +86,38 @@ tfoot .t-real td.pvc{background:var(--esp-bg)}
 .rp span{font-size:13px;color:var(--muted)}
 .rp em{font-style:normal;font:600 14px var(--display)}
 @media (max-width:560px){.repart-llista{grid-template-columns:1fr}}
+.btn{font:600 14px/1 var(--body);background:var(--accent);color:var(--surface);border:0;border-radius:4px;padding:11px 16px;cursor:pointer}
+.btn:hover{filter:brightness(1.08)} .btn:focus-visible,.btn-sec:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.btn:disabled{opacity:.5;cursor:default}
+.btn-sec{font:600 13px/1 var(--body);background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:8px 12px;cursor:pointer}
+.entrada{margin-top:22px;border:1px solid var(--accent);border-radius:4px;padding:18px;display:flex;flex-direction:column;gap:16px;background:var(--surface)}
+.ent-cap{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ent-cap h2{margin:0;font:700 18px/1.2 var(--display)}
+.seg-tipus{flex-wrap:wrap}
+.ent-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 14px;margin-top:14px}
+.ent-grid label{display:flex;flex-direction:column;gap:5px;font:600 12px/1.2 var(--body);color:var(--muted);min-width:0}
+.ent-grid label.ample{grid-column:span 2}
+.ent-grid select,.ent-grid input{font:400 15px var(--body);color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:9px 10px;width:100%;min-width:0}
+.ent-grid select:focus,.ent-grid input:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:var(--accent)}
+.ent-grid small{font-weight:400;color:var(--faint)}
+.ent-peu{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-top:14px}
+.ent-calc{margin:0;font-size:14px;flex:1 1 260px}
+.ent-err{margin:0;color:var(--over);font-size:14px;font-weight:600}
+.ent-err:empty{display:none}
+.ent-llista h3{margin:0 0 8px;font:600 13px/1 var(--display);letter-spacing:.08em;text-transform:uppercase}
+.ent-llista h3 span{color:var(--faint);font-weight:500}
+table.tl{min-width:680px}
+table.tl th,table.tl td{text-align:left}
+table.tl th:nth-child(5),table.tl td:nth-child(5){text-align:right}
+table.tl .src{display:block;font-size:11.5px;color:var(--faint)}
+table.tl td{font-size:13.5px;border-bottom:1px solid var(--line-2);padding-block:8px}
+table.tl td:nth-child(3){max-width:260px}
+.esb{background:transparent;border:1px solid transparent;color:var(--faint);border-radius:4px;padding:4px 8px;cursor:pointer;font:600 13px var(--body)}
+.esb:hover{color:var(--over);border-color:var(--line)}
+.esb.segur{color:var(--surface);background:var(--over)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:4px;font-size:14px;z-index:10}
+@media (max-width:820px){.ent-grid{grid-template-columns:1fr 1fr}.ent-grid label.ample{grid-column:1/-1}}
+@media (max-width:480px){.ent-grid{grid-template-columns:1fr}}
 .bar-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin:26px 0 12px}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:4px;overflow:hidden;background:var(--surface)}
 .seg button{font:600 13px/1 var(--body);color:var(--muted);background:transparent;border:0;padding:9px 14px;cursor:pointer}
@@ -184,6 +217,7 @@ tfoot .t-cost td.pvc{background:var(--line)}
   <div class="wrap">
     <div class="eyebrow">Fundació GironaEst · Quadre de comandament</div>
     <h1 id="titol">Reforma Global Casa de les Arts</h1>
+    <p class="actual" id="actual">Dades actualitzades el 03/10/2026 a les 18:04</p>
   </div>
 </header>
 
@@ -223,7 +257,44 @@ tfoot .t-cost td.pvc{background:var(--line)}
     <div class="repart-llista" id="repart-llista"></div>
   </section>
 
+  <section class="entrada" id="entrada" hidden aria-label="Entrar dades">
+    <div class="ent-cap">
+      <h2>Entrar dades</h2>
+      <button type="button" class="btn-sec" id="ent-tanca">Tanca</button>
+    </div>
+    <form id="ent-form" novalidate>
+      <div class="seg seg-tipus" role="radiogroup" aria-label="Què entres" id="ent-tipus">
+        <button type="button" data-t="factura" aria-pressed="true">Factura real</button>
+        <button type="button" data-t="previsio" aria-pressed="false">Previsió</button>
+        <button type="button" data-t="material" aria-pressed="false">Material donat</button>
+        <button type="button" data-t="hores" aria-pressed="false">Hores de voluntariat</button>
+      </div>
+      <div class="ent-grid">
+        <label>Fase<select id="ent-fase"></select></label>
+        <label>Industrial<select id="ent-ind"></select></label>
+        <label class="ample">Partida de Nexxo<select id="ent-linia"></select><small id="ent-linia-n"></small></label>
+        <label data-per="factura previsio material" id="ent-import-l"><span id="ent-import-t">Import sense IVA (€)</span><input id="ent-import" inputmode="decimal" placeholder="0,00" autocomplete="off"></label>
+        <label data-per="hores">Hores<input id="ent-hores" inputmode="decimal" placeholder="0" autocomplete="off"></label>
+        <label data-per="hores">Preu per hora (€)<input id="ent-preu" inputmode="decimal" placeholder="0,00" autocomplete="off"></label>
+        <label data-per="factura material hores"><span id="ent-qui-t">Proveïdor</span><input id="ent-qui" autocomplete="off"></label>
+        <label data-per="factura material"><span id="ent-ref-t">Núm. de factura</span><input id="ent-ref" autocomplete="off"></label>
+        <label data-per="factura material hores">Data<input id="ent-data" type="date"></label>
+        <label class="ample" data-per="factura previsio material hores">Nota<input id="ent-nota" autocomplete="off" placeholder="Opcional"></label>
+      </div>
+      <div class="ent-peu">
+        <p class="ent-calc" id="ent-calc"></p>
+        <p class="ent-err" id="ent-err" role="alert"></p>
+        <button type="submit" class="btn" id="ent-desa">Desa</button>
+      </div>
+    </form>
+    <div class="ent-llista">
+      <h3>Entrades fetes <span id="ent-n"></span></h3>
+      <div class="scroll"><table class="tl"><thead><tr><th>Data</th><th>Tipus</th><th>Partida</th><th>Qui · referència</th><th>Import</th><th></th></tr></thead><tbody id="ent-cos"></tbody></table></div>
+    </div>
+  </section>
+
   <div class="bar-row">
+    <button type="button" class="btn" id="ent-obre" hidden>+ Entrar dades</button>
     <div class="seg" role="group" aria-label="Filtra per fase" id="filtre">
       <button type="button" data-f="0" aria-pressed="true">Totes</button>
       <button type="button" data-f="1" aria-pressed="false">Fase 1</button>
@@ -502,21 +573,41 @@ const ESPECIE = {
   /* n12: { tipus: "material", valor: 1500, qui: "Empresa X", nota: "Què s'ha donat", doc: "albarà / certificat" },
      n34: { tipus: "hores", hores: 20, preuHora: 20, qui: "Voluntaris", nota: "Tasca", doc: "full d'hores" } */
 };
-const valorEsp = e => e ? (e.tipus === "hores" ? e.hores * e.preuHora : e.valor) : 0;
+const valorEsp = e => e ? (e.tipus === "hores" ? (e.hores||0) * (e.preuHora||0) : (e.valor||0)) : 0;
+
+/* Entrades fetes des del formulari de la pàgina (base compartida `entrades`). Al fitxer publicat a GitHub
+   no hi ha base: allà només compten les dades d'aquest fitxer, que Claude hi bolca. */
+/*ENTRADES-INICI*/const ENTRADES_FIX = [];/*ENTRADES-FI*/
+let ENTRADES = ENTRADES_FIX;
 
 /* Cada partida: { id, fase, ind, concepte, base, iva, nexxo, previsio, factura, font }
    Files SENSE IVA, com el document. El tancament (contingències, total obra, IVA, total costos) va al peu. */
 const IVA_GENERAL = 0.21;
 const CONTINGENCIES = {};   // per fase, sense IVA
 NEXXO.filter(l => l.i === "contingencies").forEach(l => CONTINGENCIES[l.f] = (CONTINGENCIES[l.f]||0) + l.b);
-const PARTIDES = NEXXO.filter(l => l.i !== "contingencies").map(l => ({
-  id: l.id, fase: l.f, ind: l.i, concepte: l.c, base: l.b, iva: l.v,
-  nexxo: l.b,
-  previsio: PREVISIONS[l.id] ?? null,
-  factura: FACTURES[l.id] ?? null,
-  esp: ESPECIE[l.id] || null,
-  font: `${l.k !== "—" ? l.k + " · " : ""}${l.cap} · pàg. ${l.p}${l.v === 0 ? " · sense IVA" : ""}`,
-}));
+const LINIES = NEXXO.filter(l => l.i !== "contingencies");
+let PARTIDES = [];
+function construeix(){
+  const per = {};
+  for(const e of ENTRADES){ (per[e.linia] ||= []).push(e); }
+  PARTIDES = LINIES.map(l => {
+    const es = per[l.id] || [];
+    const fac = es.filter(e=>e.tipus==="factura");
+    const prev = es.filter(e=>e.tipus==="previsio").sort((a,b)=>(b.creat||0)-(a.creat||0))[0];
+    const esp = [].concat(ESPECIE[l.id]||[]).concat(es.filter(e=>e.tipus==="material"||e.tipus==="hores")
+      .map(e=>({tipus:e.tipus, valor:e.import, hores:e.hores, preuHora:e.preuHora, qui:e.qui, nota:e.nota})));
+    const facBase = FACTURES[l.id] ?? null;
+    return {
+      id: l.id, fase: l.f, ind: l.i, concepte: l.c, base: l.b, iva: l.v, nexxo: l.b,
+      previsio: prev ? prev.import : (PREVISIONS[l.id] ?? null),
+      factura: fac.length || facBase!=null ? (facBase||0) + fac.reduce((a,e)=>a+(e.import||0),0) : null,
+      factures: fac,
+      esp: esp.length ? esp : null,
+      font: `${l.k !== "—" ? l.k + " · " : ""}${l.cap} · pàg. ${l.p}${l.v === 0 ? " · sense IVA" : ""}`,
+    };
+  });
+}
+construeix();
 
 /* ===== Càlcul i pintat ===== */
 const eur = n => new Intl.NumberFormat("ca-ES",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(n);
@@ -530,7 +621,7 @@ function suma(list){
   for(const p of list){
     nx += p.nexxo||0;
     if(p.previsio!=null){ pv += p.previsio; np++; }
-    if(p.esp){ const v=valorEsp(p.esp); es+=v; ne++; if(p.esp.tipus==="hores"){ esHores+=v; hores+=p.esp.hores; } else esMat+=v; }
+    if(p.esp){ ne++; for(const x of p.esp){ const v=valorEsp(x); es+=v; if(x.tipus==="hores"){ esHores+=v; hores+=x.hores||0; } else esMat+=v; } }
     if(p.factura==null){ pend += p.nexxo||0; }
     else { rf += p.factura; nr++; if(!p.esp){ rfComp += p.factura; nxComp += p.nexxo||0; nc++; } }
   }
@@ -628,7 +719,7 @@ function render(){
       if(obert) for(const p of pi){
         const sp = suma([p]);
         h += `<tr class="det"><td>${esc(p.concepte)}${p.font?`<span class="src">${esc(p.font)}</span>`:""}</td>
-          <td>${eur(p.nexxo||0)}</td><td class="pvc">${p.previsio==null?`<span class="zero">—</span>`:eur(p.previsio)}</td><td>${p.factura==null?`<span class="pill pend">Pendent</span>`:eur(p.factura)}${p.esp?`<span class="esp">+ ${eur(valorEsp(p.esp))} ${p.esp.tipus==="hores"?`<span class="pill vol">Voluntariat · ${p.esp.hores} h × ${p.esp.preuHora} €</span>`:`<span class="pill mat">Material donat</span>`}</span><span class="src">${esc(p.esp.qui)} · ${esc(p.esp.nota)}</span>`:""}</td><td>${p.esp?`<span class="zero" title="Té aportació en espècie: no es compara">no es compara</span>`:cellDv(sp)}</td></tr>`;
+          <td>${eur(p.nexxo||0)}</td><td class="pvc">${p.previsio==null?`<span class="zero">—</span>`:eur(p.previsio)}</td><td>${p.factura==null?`<span class="pill pend">Pendent</span>`:eur(p.factura)}${p.factures.length?`<span class="src">${p.factures.map(f=>esc([f.qui,f.ref].filter(Boolean).join(" · "))).filter(Boolean).join("<br>")}</span>`:""}${(p.esp||[]).map(x=>`<span class="esp">+ ${eur(valorEsp(x))} ${x.tipus==="hores"?`<span class="pill vol">Voluntariat · ${x.hores} h × ${x.preuHora} €</span>`:`<span class="pill mat">Material donat</span>`}</span><span class="src">${esc([x.qui,x.nota].filter(Boolean).join(" · "))}</span>`).join("")}</td><td>${p.esp?`<span class="zero" title="Té aportació en espècie: no es compara">no es compara</span>`:cellDv(sp)}</td></tr>`;
       }
     }
   }
@@ -669,6 +760,116 @@ const sel = r => r.classList.contains("fase") ? `tr.fase[data-f="${r.dataset.f}"
 document.getElementById("cos").addEventListener("click", e=>{ const r=fila(e); if(r) toggle(r); });
 document.getElementById("cos").addEventListener("keydown", e=>{ const r=fila(e); if(r && (e.key==="Enter"||e.key===" ")){ e.preventDefault(); const q=sel(r); toggle(r); const n=document.querySelector(q); n&&n.focus(); } });
 render();
+
+/* ===== Entrar dades (base compartida) ===== */
+const TIPUS = { factura:"Factura real", previsio:"Previsió", material:"Material donat", hores:"Hores de voluntariat" };
+const $ = id => document.getElementById(id);
+const num = v => { const t=String(v||"").trim().replace(/\s/g,"").replace(/\.(?=\d{3}(\D|$))/g,"").replace(",","."); const n=parseFloat(t); return isFinite(n)?n:null; };
+let tipus = "factura", DB = null;
+const nomLinia = id => { const l = LINIES.find(x=>x.id===id); return l ? l.c : id; };
+const indNom = id => (INDUSTRIALS.find(i=>i.id===id)||{nom:id}).nom;
+
+function omplirFases(){ $("ent-fase").innerHTML = FASES.map(f=>`<option value="${f.id}">${f.nom}</option>`).join(""); omplirInd(); }
+function omplirInd(){
+  const f = +$("ent-fase").value, ids = [...new Set(LINIES.filter(l=>l.f===f).map(l=>l.i))];
+  $("ent-ind").innerHTML = INDUSTRIALS.filter(i=>ids.includes(i.id)).map(i=>`<option value="${i.id}">${esc(i.nom)}</option>`).join("");
+  omplirLinia();
+}
+function omplirLinia(){
+  const f = +$("ent-fase").value, ind = $("ent-ind").value;
+  $("ent-linia").innerHTML = LINIES.filter(l=>l.f===f&&l.i===ind).map(l=>`<option value="${l.id}">${esc(l.k)} · ${esc(l.c)}</option>`).join("");
+  infoLinia();
+}
+function infoLinia(){
+  const p = PARTIDES.find(x=>x.id===$("ent-linia").value);
+  $("ent-linia-n").textContent = p ? `Nexxo ${eur2(p.nexxo)} sense IVA` + (p.factura!=null?` · ja facturat ${eur2(p.factura)}`:"") + (p.previsio!=null?` · previsió ${eur2(p.previsio)}`:"") : "";
+  calc();
+}
+function posaTipus(t){
+  tipus = t;
+  document.querySelectorAll("#ent-tipus button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.t===t));
+  document.querySelectorAll("#ent-form [data-per]").forEach(l=>l.hidden = !l.dataset.per.split(" ").includes(t));
+  $("ent-import-t").textContent = t==="material" ? "Valor de mercat (€)" : t==="previsio" ? "Previsió sense IVA (€)" : "Import sense IVA (€)";
+  $("ent-qui-t").textContent = t==="factura" ? "Proveïdor" : t==="material" ? "Qui ho dona" : "Qui (persona o grup)";
+  $("ent-ref-t").textContent = t==="factura" ? "Núm. de factura" : "Document (albarà, certificat…)";
+  $("ent-err").textContent = ""; calc();
+}
+function calc(){
+  const t=tipus, out=$("ent-calc");
+  if(t==="hores"){ const h=num($("ent-hores").value), pr=num($("ent-preu").value); out.innerHTML = h&&pr ? `Valor: <b>${eur2(h*pr)}</b> (${h} h × ${eur2(pr)})` : ""; }
+  else if(t==="factura"){ const v=num($("ent-import").value), p=PARTIDES.find(x=>x.id===$("ent-linia").value); out.innerHTML = v!=null&&p ? `Amb IVA: <b>${eur2(v*(1+p.iva))}</b>` + (p.iva===0?" (sense IVA)":"") : ""; }
+  else out.innerHTML = "";
+}
+async function desa(e){
+  e.preventDefault();
+  const err = $("ent-err"); err.textContent = "";
+  const linia = $("ent-linia").value;
+  if(!linia){ err.textContent = "Tria una partida."; return; }
+  const d = { tipus, linia, nota: $("ent-nota").value.trim(), creat: Date.now() };
+  if(tipus==="hores"){
+    d.hores = num($("ent-hores").value); d.preuHora = num($("ent-preu").value);
+    if(!d.hores || d.hores<=0){ err.textContent = "Escriu quantes hores."; return; }
+    if(d.preuHora==null || d.preuHora<0){ err.textContent = "Escriu el preu per hora."; return; }
+    d.import = Math.round(d.hores*d.preuHora*100)/100;
+  } else {
+    d.import = num($("ent-import").value);
+    if(d.import==null || d.import<0){ err.textContent = "Escriu l'import en euros, per exemple 1250,50."; return; }
+  }
+  if(tipus!=="previsio"){ d.qui = $("ent-qui").value.trim(); d.data = $("ent-data").value || ""; }
+  if(tipus==="factura"||tipus==="material") d.ref = $("ent-ref").value.trim();
+  const btn = $("ent-desa"); btn.disabled = true;
+  try{
+    if(tipus==="previsio") await DB.collection("entrades").doc("prev-"+linia).set(d);
+    else await DB.collection("entrades").add(d);
+    ["ent-import","ent-hores","ent-ref","ent-nota"].forEach(id=>$(id).value="");
+    toast(`Desat: ${TIPUS[tipus]} · ${nomLinia(linia)}`);
+  }catch(x){
+    err.textContent = x && x.code==="invalid_argument" ? "No tens permís per desar dades en aquest quadre. Demana a qui el comparteix que et doni accés de Col·laborador." : "No s'ha pogut desar. Torna-ho a provar d'aquí a un moment.";
+  }finally{ btn.disabled = false; }
+}
+function pintaLlista(){
+  const ll = [...ENTRADES].sort((a,b)=>(b.creat||0)-(a.creat||0));
+  $("ent-n").textContent = ll.length ? `· ${ll.length}` : "";
+  $("ent-cos").innerHTML = ll.length ? ll.map(e=>`<tr><td>${esc(e.data||new Date(e.creat||0).toISOString().slice(0,10))}</td><td>${TIPUS[e.tipus]||esc(e.tipus)}</td>
+    <td>${esc(nomLinia(e.linia))}<span class="src">${esc(indNom((LINIES.find(l=>l.id===e.linia)||{}).i))} · Fase ${(LINIES.find(l=>l.id===e.linia)||{}).f||"?"}</span></td>
+    <td>${esc([e.qui,e.ref].filter(Boolean).join(" · ")||"—")}${e.nota?`<span class="src">${esc(e.nota)}</span>`:""}</td>
+    <td>${eur2(e.import||0)}${e.tipus==="hores"?`<span class="src">${e.hores} h × ${eur2(e.preuHora)}</span>`:""}</td>
+    <td><button type="button" class="esb" data-id="${esc(e._id)}" aria-label="Esborra aquesta entrada">×</button></td></tr>`).join("")
+    : `<tr><td colspan="6" class="zero">Encara no hi ha cap entrada. Tria què entres, la partida i l'import, i prem Desa.</td></tr>`;
+}
+let tTimer;
+function toast(m){ let t=document.querySelector(".toast"); if(!t){ t=document.createElement("div"); t.className="toast"; t.setAttribute("role","status"); document.body.appendChild(t);} t.textContent=m; t.hidden=false; clearTimeout(tTimer); tTimer=setTimeout(()=>t.hidden=true,3000); }
+
+$("ent-cos").addEventListener("click", async e=>{
+  const b = e.target.closest(".esb"); if(!b) return;
+  if(!b.classList.contains("segur")){ b.classList.add("segur"); b.textContent="Esborra"; setTimeout(()=>{ if(b.isConnected){ b.classList.remove("segur"); b.textContent="×"; } },4000); return; }
+  try{ await DB.collection("entrades").doc(b.dataset.id).delete(); toast("Entrada esborrada"); }
+  catch(x){ toast("No s'ha pogut esborrar."); }
+});
+$("ent-tipus").addEventListener("click", e=>{ const b=e.target.closest("button"); if(b) posaTipus(b.dataset.t); });
+$("ent-fase").addEventListener("change", omplirInd);
+$("ent-ind").addEventListener("change", omplirLinia);
+$("ent-linia").addEventListener("change", infoLinia);
+["ent-import","ent-hores","ent-preu"].forEach(id=>$(id).addEventListener("input", calc));
+$("ent-form").addEventListener("submit", desa);
+$("ent-obre").addEventListener("click", ()=>{ $("entrada").hidden=false; $("ent-obre").hidden=true; $("ent-fase").focus(); });
+$("ent-tanca").addEventListener("click", ()=>{ $("entrada").hidden=true; $("ent-obre").hidden=false; });
+
+(async () => {
+  const claude = window.claude; if(!claude || !claude.use) return;
+  const db = await claude.use("db"); if(!db) return;
+  const user = await claude.use("user");
+  const pot = user ? await user.can("data.write") : null;
+  DB = db;
+  db.collection("entrades").onSnapshot(snap => {
+    ENTRADES = snap.docs.map(d => ({ _id: d.id, ...d.data() })).filter(e => LINIES.some(l=>l.id===e.linia));
+    construeix(); render(); pintaLlista(); infoLinia();
+  }, () => {});
+  if(pot === false) return;   // només lectura
+  $("ent-data").value = new Date().toISOString().slice(0,10);
+  omplirFases(); posaTipus("factura"); pintaLlista();
+  $("ent-obre").hidden = false;
+})();
 </script>
 
 </html>
