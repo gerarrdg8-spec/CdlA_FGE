@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="ca"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="robots" content="noindex, nofollow"><style>[hidden]{display:none!important}body{margin:0}</style>
+<title>Reforma Global Casa de les Arts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: banda fosca de capçalera + tres xifres + matriu Fase › Industrial × (Nexxo | Previsió | Factura real | Desviació) */
+:root{
+  --bg:#f2f4f1; --surface:#ffffff; --surface-2:#f6f8f5; --line:#dce2da; --line-2:#e9ede7;
+  --fg:#17231a; --muted:#56635a; --faint:#838280;
+  --band:#17301C; --band-fg:#eef4ec; --band-muted:#a9bfa9; --band-accent:#93C02C;
+  --accent:#1E7A2F;          /* factura real (ple) — verd de la Fundació */
+  --nexxo:#838280;           /* avantprojecte Nexxo (contorn) — gris del logotip */
+  --over:#b4362c; --over-bg:#fbe9e7;    /* desviació a l'alça */
+  --under:#00699A; --under-bg:#e3f0f7;  /* per sota: blau, perquè el verd ja és la marca */
+  --pend:#8a6a12; --pend-bg:#fbf3dc;
+  --f1:#1E7A2F; --f2:#00699A; --f3:#B45F2B;
+  --display:"IBM Plex Sans Condensed","IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1510; --surface:#152018; --surface-2:#1a271d; --line:#2a3a2d; --line-2:#213024;
+  --fg:#e6efe5; --muted:#a3b3a5; --faint:#8a9a8c;
+  --band:#080F09; --band-fg:#eef4ec; --band-muted:#93a995; --band-accent:#A9D147;
+  --accent:#57C06A; --nexxo:#a3a29f;
+  --over:#f08a7e; --over-bg:#3a1f1c; --under:#5E8FE8; --under-bg:#16243a; --pend:#e2c06a; --pend-bg:#33290f;
+  --f1:#57C06A; --f2:#5E8FE8; --f3:#D07F45; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1510; --surface:#152018; --surface-2:#1a271d; --line:#2a3a2d; --line-2:#213024;
+  --fg:#e6efe5; --muted:#a3b3a5; --faint:#8a9a8c;
+  --band:#080F09; --band-fg:#eef4ec; --band-muted:#93a995; --band-accent:#A9D147;
+  --accent:#57C06A; --nexxo:#a3a29f;
+  --over:#f08a7e; --over-bg:#3a1f1c; --under:#5E8FE8; --under-bg:#16243a; --pend:#e2c06a; --pend-bg:#33290f;
+  --f1:#57C06A; --f2:#5E8FE8; --f3:#D07F45; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--body);font-variant-numeric:tabular-nums}
+.band{background:var(--band);color:var(--band-fg);padding:22px 16px 26px}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px}
+.band .wrap{padding-inline:0}
+.eyebrow{font:600 11px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--band-accent)}
+h1{font:700 clamp(24px,3.4vw,34px)/1.1 var(--display);margin:8px 0 6px;text-wrap:balance;letter-spacing:-.01em}
+.sub{color:var(--band-muted);margin:0;font-size:14px}
+.sub b{color:var(--band-fg);font-weight:600}
+
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:-18px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:16px 18px 14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.kpi .lab{display:flex;align-items:center;gap:8px;font:600 12px/1 var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.kpi .val{font:700 clamp(22px,2.8vw,30px)/1.1 var(--display);letter-spacing:-.01em}
+.kpi .note{font-size:13px;color:var(--muted)}
+.sw{width:12px;height:12px;border-radius:3px;flex:none}
+.sw.nx{border:2px solid var(--nexxo);background:transparent}
+.sw.rf{background:var(--accent)}
+.sw.pv{background:transparent;border:2px dashed var(--accent)}
+.sw.dv{background:linear-gradient(90deg,var(--under) 50%,var(--over) 50%)}
+.val.over{color:var(--over)} .val.under{color:var(--under)}
+
+.bar-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin:26px 0 12px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:4px;overflow:hidden;background:var(--surface)}
+.seg button{font:600 13px/1 var(--body);color:var(--muted);background:transparent;border:0;padding:9px 14px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.seg button:focus-visible,.ind-row:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+
+.empty{display:flex;gap:12px;align-items:flex-start;background:var(--pend-bg);color:var(--fg);border:1px solid var(--line);border-radius:4px;padding:12px 16px;font-size:14px;margin-bottom:14px}
+.empty b{color:var(--pend)}
+.empty[hidden]{display:none}
+
+.scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:4px}
+table{width:100%;border-collapse:collapse;min-width:940px}
+th,td{padding:10px 14px;text-align:right;vertical-align:middle}
+th:first-child,td:first-child{text-align:left}
+thead th{font:600 12px/1.2 var(--display);letter-spacing:.07em;text-transform:uppercase;color:var(--muted);background:var(--surface-2);border-bottom:1px solid var(--line);position:sticky;top:0;white-space:nowrap}
+thead th .hd{display:inline-flex;align-items:center;gap:7px}
+col.c-ind{width:24%} col.c-nx,col.c-rf{width:16%} col.c-dv{width:24%} col.c-pv{width:20%}
+td.pvc,th.pvc{background:color-mix(in srgb,var(--accent) 6%,transparent);border-left:1px solid var(--line);border-right:1px solid var(--line)}
+.pv{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.pv b{font-weight:600}
+.pv small{font-size:11.5px;color:var(--muted)}
+
+tr.fase td{background:var(--surface-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding-block:12px}
+tr.fase:first-child td{border-top:0}
+.fname{display:flex;align-items:center;gap:10px;font:700 16px/1.2 var(--display)}
+.fname i{width:4px;height:20px;border-radius:2px;display:block}
+.fname small{font:500 12px var(--body);color:var(--muted)}
+tr.fase .num{font:700 15px var(--display)}
+
+.ind-row{cursor:pointer}
+.ind-row td{border-bottom:1px solid var(--line-2)}
+.ind-row:hover td{background:var(--surface-2)}
+.ind-name{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}
+.ind-name .pill,.cnt{white-space:nowrap}
+.chev{width:16px;height:16px;flex:none;color:var(--faint);transition:transform .15s}
+.ind-row[aria-expanded="true"] .chev{transform:rotate(90deg)}
+.cnt{font-size:12px;color:var(--faint)}
+.zero{color:var(--faint)}
+.num{font-weight:500}
+.pill{display:inline-block;font:600 11px/1 var(--body);padding:4px 7px;border-radius:999px;letter-spacing:.02em}
+.pill.pend{background:var(--pend-bg);color:var(--pend)}
+.pill.prop{background:color-mix(in srgb,var(--f2) 14%,transparent);color:var(--f2)}
+.pill.cost{background:var(--line-2);color:var(--muted)}
+.ok{color:var(--accent);font-weight:600} .ko{color:var(--over);font-weight:600}
+
+.dv{display:grid;grid-template-columns:1fr 84px;align-items:center;gap:12px}
+.dv-txt{display:flex;flex-direction:column;align-items:flex-end;line-height:1.2}
+.dv-txt b{font-weight:600}
+.dv-txt small{font-size:12px}
+.over{color:var(--over)} .under{color:var(--under)}
+.track{position:relative;height:8px;background:var(--line-2);border-radius:4px}
+.track::after{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--faint)}
+.track span{position:absolute;top:0;bottom:0;border-radius:4px}
+.track .o{left:50%;background:var(--over)} .track .u{right:50%;background:var(--under)}
+
+tr.det td{font-size:13.5px;color:var(--muted);border-bottom:1px solid var(--line-2);padding-block:7px}
+tr.det td:first-child{padding-left:46px}
+tr.det .src{font-size:11.5px;color:var(--faint);display:block}
+
+tfoot td{font:500 15px var(--body);padding-block:11px}
+tfoot .t-fases td{font:700 15px var(--display);border-top:2px solid var(--fg)}
+tfoot .t-linia td{border-top:1px solid var(--line-2)}
+tfoot .t-obra td{background:var(--nexxo);color:var(--surface);font-weight:600}
+tfoot .t-obra td.pvc{background:var(--nexxo)}
+tfoot .t-obra .zero{color:var(--surface)}
+tfoot .t-cost td{background:var(--line);font:700 17px var(--display);border-top:2px solid var(--fg);border-bottom:2px solid var(--fg)}
+tfoot .t-cost td.pvc{background:var(--line)}
+
+.cmp{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+.cmp div{height:6px;border-radius:3px}
+.cmp .n{border:1.5px solid var(--nexxo);background:transparent}
+.cmp .r{background:var(--accent)}
+
+.foot{color:var(--muted);font-size:13px;margin:16px 0 40px;display:grid;gap:4px}
+.foot p{margin:0;max-width:80ch}
+
+@media (max-width:980px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){
+  .kpis{grid-template-columns:1fr;margin-top:-14px}
+}
+@media (prefers-reduced-motion:reduce){.chev{transition:none}}
+</style>
+
+<header class="band">
+  <div class="wrap">
+    <div class="eyebrow">Fundació GironaEst · Quadre de comandament</div>
+    <h1 id="titol">Reforma Global Casa de les Arts</h1>
+    <p class="sub" id="subtitol">Sense documents carregats encara. Primer pas: <b>avantprojecte de Nexxo</b>.</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="kpis" aria-label="Totals">
+    <div class="kpi">
+      <div class="lab"><span class="sw nx"></span>Avantprojecte Nexxo</div>
+      <div class="val" id="k-nx">0 €</div>
+      <div class="note" id="k-nx-n">0 partides</div>
+    </div>
+    <div class="kpi">
+      <div class="lab"><span class="sw pv"></span>Previsió</div>
+      <div class="val" id="k-pv">0 €</div>
+      <div class="note" id="k-pv-n">Xifra que fixem nosaltres per a cada partida</div>
+    </div>
+    <div class="kpi">
+      <div class="lab"><span class="sw rf"></span>Factura real</div>
+      <div class="val" id="k-rf">0 €</div>
+      <div class="note" id="k-rf-n">0 partides facturades</div>
+    </div>
+    <div class="kpi">
+      <div class="lab"><span class="sw dv"></span>Desviació</div>
+      <div class="val" id="k-dv">—</div>
+      <div class="note" id="k-dv-n">Sobre les partides que tenen les dues xifres</div>
+    </div>
+  </section>
+
+  <div class="bar-row">
+    <div class="seg" role="group" aria-label="Filtra per fase" id="filtre">
+      <button type="button" data-f="0" aria-pressed="true">Totes</button>
+      <button type="button" data-f="1" aria-pressed="false">Fase 1</button>
+      <button type="button" data-f="2" aria-pressed="false">Fase 2</button>
+      <button type="button" data-f="3" aria-pressed="false">Fase 3</button>
+    </div>
+    <div class="legend">
+      <span><span class="sw nx"></span>Nexxo (previst)</span>
+      <span><span class="sw pv"></span>Previsió</span>
+      <span><span class="sw rf"></span>Factura real</span>
+      <span class="over">▲ per sobre</span>
+      <span class="under">▼ per sota</span>
+    </div>
+  </div>
+
+  <div class="empty" id="buit"><span>●</span><div><b>Estructura preparada, sense xifres.</b> Quan arribi el document de Nexxo, cada partida es col·locarà a la seva fase i al seu industrial. Després hi entraran les factures reals i la previsió i la desviació es calcularà sola.</div></div>
+
+  <div class="scroll">
+    <table>
+      <colgroup><col class="c-ind"><col class="c-nx"><col class="c-pv"><col class="c-rf"><col class="c-dv"></colgroup>
+      <thead><tr>
+        <th>Fase · Industrial</th>
+        <th><span class="hd"><span class="sw nx"></span>Avantprojecte Nexxo</span></th>
+        <th class="pvc"><span class="hd"><span class="sw pv"></span>Previsió</span></th>
+        <th class="rfc"><span class="hd"><span class="sw rf"></span>Factura real</span></th>
+        <th>Desviació</th>
+      </tr></thead>
+      <tbody id="cos"></tbody>
+      <tfoot id="peu"></tfoot>
+    </table>
+  </div>
+
+  <div class="foot">
+    <p>Desviació = Factura real − Nexxo. En vermell ▲ quan la factura supera el previst; en blau ▼ quan queda per sota. Les partides sense factura surten com a <span class="pill pend">Pendent</span> (dins de cada industrial) i no entren al càlcul de la desviació. <span class="pill cost">No industrial</span> = cost del document que no és d'obra.</p>
+    <p>Previsió = la xifra que fixem nosaltres per a cada partida. No surt de cap document. Les partides sense previsió no hi sumen.</p>
+    <p>Les files van sense IVA, com el document de Nexxo. Al peu, igual que al document: contingències del 10 %, total obra, IVA 21 % i <b>total costos</b>, que és el que paga la Fundació perquè no pot deduir l'IVA. L'ICIO no porta IVA. Les xifres de dalt són amb IVA. Clica un industrial per veure'n les partides.</p>
+  </div>
+</main>
+
+<script>
+/* ===== Dades: aquí s'hi bolquen els documents ===== */
+const PROJECTE = { nom: "Reforma Global Casa de les Arts", nexxoDoc: "Pre-estudi de costos per fases (27/11/2025)", nexxoTotalDoc: 586583.02, facturaDocs: [] };
+
+const FASES = [
+  { id: 1, nom: "Fase 1", desc: "" },
+  { id: 2, nom: "Fase 2", desc: "" },
+  { id: 3, nom: "Fase 3", desc: "" },
+];
+
+/* tipus: "base" (sempre visible) · "extra" (industrial que surt només a les fases on té partides) · "cost" (no és un industrial) */
+const INDUSTRIALS = [
+  { id: "electricista", nom: "Electricista", tipus: "base" },
+  { id: "paleta",       nom: "Paleta",       tipus: "base" },
+  { id: "tancaments",   nom: "Tancaments",   tipus: "base" },
+  { id: "pintura",      nom: "Pintura",      tipus: "base" },
+  { id: "mobiliari",    nom: "Mobiliari",    tipus: "base" },
+  { id: "clima",        nom: "Climatització", tipus: "extra" },
+  { id: "fusteria",     nom: "Fusteria",     tipus: "extra" },
+  { id: "serralleria",  nom: "Serralleria",  tipus: "extra" },
+  { id: "jardineria",   nom: "Jardineria",   tipus: "extra" },
+  { id: "diposits",     nom: "Sistema de dipòsits", tipus: "extra" },
+  { id: "solar",        nom: "Plaques solars", tipus: "extra" },
+  { id: "tecnics",      nom: "Honoraris i llicències", tipus: "cost" },
+  { id: "seguretat",    nom: "Seguretat i residus", tipus: "cost" },
+];
+
+/* Línies del document de Nexxo, tal com surten (import SENSE IVA a `b`, tipus d'IVA a `v`).
+   Les genera dades/nexxo.py: no editar a mà. */
+/*NEXXO-INICI*/const NEXXO = [
+{"id": "n1", "f": 1, "i": "fusteria", "cap": "1. Fusteria interior", "k": "01.002", "c": "Subministrament i instal·lació de porta interior de fusta", "b": 350, "v": 0.21, "p": 3},
+{"id": "n2", "f": 1, "i": "fusteria", "cap": "1. Fusteria interior", "k": "01.002", "c": "Reparació de portes interiors de fusta (16 u)", "b": 2400, "v": 0.21, "p": 3},
+{"id": "n3", "f": 1, "i": "paleta", "cap": "2. Ampliació annex", "k": "02.001", "c": "Enderroc de paret de fàbrica", "b": 1625, "v": 0.21, "p": 4},
+{"id": "n4", "f": 1, "i": "paleta", "cap": "2. Ampliació annex", "k": "02.001", "c": "Enderroc de forjat de coberta de fusta i rajola", "b": 800, "v": 0.21, "p": 4},
+{"id": "n5", "f": 1, "i": "paleta", "cap": "2. Ampliació annex", "k": "02.001", "c": "Enderroc de coberta de teules amb aplec de teules", "b": 500, "v": 0.21, "p": 4},
+{"id": "n6", "f": 1, "i": "paleta", "cap": "2. Ampliació annex", "k": "02.001", "c": "Enderroc de paviment ceràmic", "b": 1530, "v": 0.21, "p": 4},
+{"id": "n7", "f": 1, "i": "paleta", "cap": "2. Ampliació annex", "k": "02.001", "c": "Enderroc d'instal·lacions existents del volum annex", "b": 800, "v": 0.21, "p": 4},
+{"id": "n8", "f": 1, "i": "clima", "cap": "2. Ampliació annex", "k": "02.001", "c": "Retirada i reubicació de la unitat exterior de clima", "b": 900, "v": 0.21, "p": 4},
+{"id": "n9", "f": 1, "i": "paleta", "cap": "2. Ampliació annex", "k": "02.002", "c": "Enderroc de solera i paviment de gres", "b": 1470, "v": 0.21, "p": 4},
+{"id": "n10", "f": 1, "i": "paleta", "cap": "2. Ampliació annex", "k": "02.002", "c": "Rasa per sabata correguda", "b": 889.7, "v": 0.21, "p": 4},
+{"id": "n11", "f": 1, "i": "paleta", "cap": "2. Ampliació annex", "k": "02.002", "c": "Rasa per sabata aïllada", "b": 70, "v": 0.21, "p": 4},
+{"id": "n12", "f": 1, "i": "paleta", "cap": "2. Ampliació annex", "k": "02.003", "c": "Sabata correguda", "b": 3813, "v": 0.21, "p": 4},
+{"id": "n13", "f": 1, "i": "paleta", "cap": "2. Ampliació annex", "k": "02.003", "c": "Sabata aïllada", "b": 450, "v": 0.21, "p": 4},
+{"id": "n14", "f": 1, "i": "paleta", "cap": "2. Ampliació annex", "k": "02.003", "c": "Forjat sanitari", "b": 10500, "v": 0.21, "p": 4},
+{"id": "n15", "f": 1, "i": "paleta", "cap": "2. Ampliació annex", "k": "02.003", "c": "Mur de càrrega (fonaments)", "b": 1800, "v": 0.21, "p": 4},
+{"id": "n16", "f": 1, "i": "serralleria", "cap": "2. Ampliació annex", "k": "02.004", "c": "Pilar metàl·lic", "b": 225, "v": 0.21, "p": 5},
+{"id": "n17", "f": 1, "i": "paleta", "cap": "2. Ampliació annex", "k": "02.004", "c": "Paret de càrrega", "b": 13500, "v": 0.21, "p": 5},
+{"id": "n18", "f": 1, "i": "serralleria", "cap": "2. Ampliació annex", "k": "02.004", "c": "Jàssera metàl·lica", "b": 1500, "v": 0.21, "p": 5},
+{"id": "n19", "f": 1, "i": "paleta", "cap": "2. Ampliació annex", "k": "02.004", "c": "Cèrcol perimetral en mur de càrrega", "b": 875, "v": 0.21, "p": 5},
+{"id": "n20", "f": 1, "i": "paleta", "cap": "2. Ampliació annex", "k": "02.004", "c": "Forjat de biguetes amb revoltons i capa de compressió", "b": 15400, "v": 0.21, "p": 5},
+{"id": "n21", "f": 1, "i": "paleta", "cap": "2. Ampliació annex", "k": "02.004", "c": "Coberta lleugera de teules", "b": 19500, "v": 0.21, "p": 5},
+{"id": "n22", "f": 1, "i": "paleta", "cap": "2. Ampliació annex", "k": "02.005", "c": "Revestiment de cartró guix per a biga metàl·lica", "b": 450, "v": 0.21, "p": 5},
+{"id": "n23", "f": 1, "i": "paleta", "cap": "2. Ampliació annex", "k": "02.005", "c": "Trasdossats aïllants de façana", "b": 7500, "v": 0.21, "p": 5},
+{"id": "n24", "f": 1, "i": "paleta", "cap": "2. Ampliació annex", "k": "02.005", "c": "Paviment d'acabat", "b": 4200, "v": 0.21, "p": 5},
+{"id": "n25", "f": 1, "i": "tancaments", "cap": "2. Ampliació annex", "k": "02.006", "c": "Portes d'accés (3 u)", "b": 2400, "v": 0.21, "p": 5},
+{"id": "n26", "f": 1, "i": "mobiliari", "cap": "2. Ampliació annex", "k": "02.006", "c": "Cortines de compartimentació d'espais (4 u)", "b": 10000, "v": 0.21, "p": 5},
+{"id": "n27", "f": 1, "i": "tancaments", "cap": "2. Ampliació annex", "k": "02.006", "c": "Finestral fix (2 u)", "b": 2400, "v": 0.21, "p": 5},
+{"id": "n28", "f": 1, "i": "tancaments", "cap": "2. Ampliació annex", "k": "02.006", "c": "Balconera de 3 fulles (3 u)", "b": 6000, "v": 0.21, "p": 5},
+{"id": "n29", "f": 1, "i": "clima", "cap": "2. Ampliació annex", "k": "02.007", "c": "Sistema de climatització", "b": 15000, "v": 0.21, "p": 5},
+{"id": "n30", "f": 1, "i": "electricista", "cap": "2. Ampliació annex", "k": "02.007", "c": "Instal·lació elèctrica", "b": 5200, "v": 0.21, "p": 5},
+{"id": "n31", "f": 1, "i": "paleta", "cap": "3. Cuina i barra exterior", "k": "03.001", "c": "Enderroc de paret de fàbrica per ampliar finestra", "b": 200, "v": 0.21, "p": 6},
+{"id": "n32", "f": 1, "i": "paleta", "cap": "3. Cuina i barra exterior", "k": "03.001", "c": "Retirada d'instal·lacions existents", "b": 800, "v": 0.21, "p": 6},
+{"id": "n33", "f": 1, "i": "electricista", "cap": "3. Cuina i barra exterior", "k": "03.003", "c": "Nova instal·lació d'aigua sanitària", "b": 2200, "v": 0.21, "p": 6},
+{"id": "n34", "f": 1, "i": "electricista", "cap": "3. Cuina i barra exterior", "k": "03.003", "c": "Instal·lació elèctrica per a electrodomèstics", "b": 1200, "v": 0.21, "p": 6},
+{"id": "n35", "f": 1, "i": "electricista", "cap": "3. Cuina i barra exterior", "k": "03.003", "c": "Il·luminació i punts d'endoll", "b": 900, "v": 0.21, "p": 6},
+{"id": "n36", "f": 1, "i": "pintura", "cap": "3. Cuina i barra exterior", "k": "03.005", "c": "Pintat interior de parets i sostres", "b": 616, "v": 0.21, "p": 7},
+{"id": "n37", "f": 1, "i": "paleta", "cap": "3. Cuina i barra exterior", "k": "03.005", "c": "Remolinat exterior", "b": 300, "v": 0.21, "p": 7},
+{"id": "n38", "f": 1, "i": "pintura", "cap": "3. Cuina i barra exterior", "k": "03.005", "c": "Pintat exterior", "b": 120, "v": 0.21, "p": 7},
+{"id": "n39", "f": 1, "i": "tancaments", "cap": "3. Cuina i barra exterior", "k": "03.006", "c": "Finestra d'alumini de guillotina per a la barra", "b": 1836, "v": 0.21, "p": 7},
+{"id": "n40", "f": 1, "i": "paleta", "cap": "3. Cuina i barra exterior", "k": "03.007", "c": "Suport de barra exterior d'obra", "b": 350, "v": 0.21, "p": 7},
+{"id": "n41", "f": 1, "i": "mobiliari", "cap": "3. Cuina i barra exterior", "k": "03.007", "c": "Taulell de Silestone de la barra exterior", "b": 1200, "v": 0.21, "p": 7},
+{"id": "n42", "f": 1, "i": "mobiliari", "cap": "3. Cuina i barra exterior", "k": "03.008", "c": "Joc complet d'electrodomèstics de cuina", "b": 5000, "v": 0.21, "p": 7},
+{"id": "n43", "f": 1, "i": "electricista", "cap": "3. Cuina i barra exterior", "k": "03.008", "c": "Aigüera i aixeta de cuina", "b": 450, "v": 0.21, "p": 7},
+{"id": "n44", "f": 1, "i": "paleta", "cap": "4. Taller", "k": "04.001", "c": "Enderroc d'envà existent", "b": 225, "v": 0.21, "p": 8},
+{"id": "n45", "f": 1, "i": "paleta", "cap": "4. Taller", "k": "04.001", "c": "Enderroc de paviment existent", "b": 630, "v": 0.21, "p": 8},
+{"id": "n46", "f": 1, "i": "paleta", "cap": "4. Taller", "k": "04.002", "c": "Morter d'anivellament", "b": 525, "v": 0.21, "p": 8},
+{"id": "n47", "f": 1, "i": "paleta", "cap": "4. Taller", "k": "04.002", "c": "Paviment ceràmic", "b": 1260, "v": 0.21, "p": 8},
+{"id": "n48", "f": 1, "i": "paleta", "cap": "4. Taller", "k": "04.002", "c": "Sòcol", "b": 600, "v": 0.21, "p": 8},
+{"id": "n49", "f": 1, "i": "electricista", "cap": "4. Taller", "k": "04.003", "c": "Punts de corrent nous (3 u)", "b": 330, "v": 0.21, "p": 8},
+{"id": "n50", "f": 1, "i": "pintura", "cap": "4. Taller", "k": "04.005", "c": "Pintura general amb repassos", "b": 960, "v": 0.21, "p": 8},
+{"id": "n51", "f": 1, "i": "mobiliari", "cap": "4. Taller", "k": "04.006", "c": "Taules i cadires de taller", "b": 1000, "v": 0.21, "p": 8},
+{"id": "n52", "f": 1, "i": "mobiliari", "cap": "5. Magatzem", "k": "05.002", "c": "Arxivadors nous", "b": 2000, "v": 0.21, "p": 9},
+{"id": "n53", "f": 1, "i": "paleta", "cap": "6. Sala de reunions", "k": "06.001", "c": "Enderroc de mobiliari existent", "b": 200, "v": 0.21, "p": 10},
+{"id": "n54", "f": 1, "i": "paleta", "cap": "6. Sala de reunions", "k": "06.001", "c": "Enderroc d'envans i particions", "b": 500, "v": 0.21, "p": 10},
+{"id": "n55", "f": 1, "i": "paleta", "cap": "6. Sala de reunions", "k": "06.001", "c": "Enderroc de paviment existent", "b": 500, "v": 0.21, "p": 10},
+{"id": "n56", "f": 1, "i": "paleta", "cap": "6. Sala de reunions", "k": "06.001", "c": "Transport de runa a gestor autoritzat", "b": 400, "v": 0.21, "p": 10},
+{"id": "n57", "f": 1, "i": "paleta", "cap": "6. Sala de reunions", "k": "06.002", "c": "Morter d'anivellament", "b": 700, "v": 0.21, "p": 10},
+{"id": "n58", "f": 1, "i": "paleta", "cap": "6. Sala de reunions", "k": "06.002", "c": "Paviment ceràmic", "b": 1680, "v": 0.21, "p": 10},
+{"id": "n59", "f": 1, "i": "paleta", "cap": "6. Sala de reunions", "k": "06.002", "c": "Sòcol", "b": 690, "v": 0.21, "p": 10},
+{"id": "n60", "f": 1, "i": "mobiliari", "cap": "6. Sala de reunions", "k": "06.003", "c": "Taules d'oficina modulars (6 u)", "b": 4200, "v": 0.21, "p": 10},
+{"id": "n61", "f": 1, "i": "mobiliari", "cap": "6. Sala de reunions", "k": "06.003", "c": "Cadires d'oficina (25 u)", "b": 3250, "v": 0.21, "p": 10},
+{"id": "n62", "f": 1, "i": "electricista", "cap": "7. Banys", "k": "07.001", "c": "Desmuntatge de sanitaris (6 u)", "b": 270, "v": 0.21, "p": 11},
+{"id": "n63", "f": 1, "i": "paleta", "cap": "7. Banys", "k": "07.001", "c": "Enderroc de revestiments", "b": 1200, "v": 0.21, "p": 11},
+{"id": "n64", "f": 1, "i": "paleta", "cap": "7. Banys", "k": "07.002", "c": "Obertura de pas en envà de fàbrica", "b": 400, "v": 0.21, "p": 11},
+{"id": "n65", "f": 1, "i": "fusteria", "cap": "7. Banys", "k": "07.002", "c": "Porta nova", "b": 350, "v": 0.21, "p": 11},
+{"id": "n66", "f": 1, "i": "paleta", "cap": "7. Banys", "k": "07.003", "c": "Envà de cartró guix hidròfug", "b": 450, "v": 0.21, "p": 11},
+{"id": "n67", "f": 1, "i": "electricista", "cap": "7. Banys", "k": "07.004", "c": "Revisió de la instal·lació d'aigua sanitària", "b": 500, "v": 0.21, "p": 11},
+{"id": "n68", "f": 1, "i": "electricista", "cap": "7. Banys", "k": "07.004", "c": "Desguassos i punts d'aigua nous", "b": 400, "v": 0.21, "p": 11},
+{"id": "n69", "f": 1, "i": "electricista", "cap": "7. Banys", "k": "07.004", "c": "Modificació d'il·luminació i encesa nova", "b": 1500, "v": 0.21, "p": 11},
+{"id": "n70", "f": 1, "i": "paleta", "cap": "7. Banys", "k": "07.005", "c": "Enrajolat de parets", "b": 2400, "v": 0.21, "p": 12},
+{"id": "n71", "f": 1, "i": "paleta", "cap": "7. Banys", "k": "07.005", "c": "Enrajolat de paviment", "b": 420, "v": 0.21, "p": 12},
+{"id": "n72", "f": 1, "i": "paleta", "cap": "7. Banys", "k": "07.005", "c": "Enrajolat de paviment del magatzem", "b": 180, "v": 0.21, "p": 12},
+{"id": "n73", "f": 1, "i": "pintura", "cap": "7. Banys", "k": "07.005", "c": "Pintat dels banys", "b": 56, "v": 0.21, "p": 12},
+{"id": "n74", "f": 1, "i": "pintura", "cap": "7. Banys", "k": "07.005", "c": "Pintat del magatzem", "b": 200, "v": 0.21, "p": 12},
+{"id": "n75", "f": 1, "i": "paleta", "cap": "7. Banys", "k": "07.006", "c": "Impermeabilització tipus Kerdi", "b": 350, "v": 0.21, "p": 12},
+{"id": "n76", "f": 1, "i": "electricista", "cap": "7. Banys", "k": "07.006", "c": "Plat de dutxa de resina", "b": 250, "v": 0.21, "p": 12},
+{"id": "n77", "f": 1, "i": "electricista", "cap": "7. Banys", "k": "07.007", "c": "Sanitaris (4 u)", "b": 600, "v": 0.21, "p": 12},
+{"id": "n78", "f": 1, "i": "electricista", "cap": "7. Banys", "k": "07.007", "c": "Griferies de lavabo i dutxa (4 u)", "b": 480, "v": 0.21, "p": 12},
+{"id": "n79", "f": 1, "i": "electricista", "cap": "7. Banys", "k": "07.007", "c": "Jocs d'accessoris de bany (2 u)", "b": 300, "v": 0.21, "p": 12},
+{"id": "n80", "f": 1, "i": "jardineria", "cap": "8. Hort", "k": "8.001", "c": "Terraplè i anivellament amb terra vegetal (annex)", "b": 200, "v": 0.21, "p": 13},
+{"id": "n81", "f": 1, "i": "jardineria", "cap": "8. Hort", "k": "8.002", "c": "Reblert de terra vegetal i anivellament de l'hort", "b": 1800, "v": 0.21, "p": 13},
+{"id": "n82", "f": 1, "i": "electricista", "cap": "8. Hort", "k": "8.003", "c": "Escomesa de llum", "b": 1200, "v": 0.21, "p": 13},
+{"id": "n83", "f": 1, "i": "electricista", "cap": "8. Hort", "k": "8.003", "c": "Subquadre d'il·luminació", "b": 400, "v": 0.21, "p": 13},
+{"id": "n84", "f": 1, "i": "electricista", "cap": "8. Hort", "k": "8.003", "c": "Bàculs i focus (2 u)", "b": 2000, "v": 0.21, "p": 13},
+{"id": "n85", "f": 1, "i": "jardineria", "cap": "8. Hort", "k": "8.004", "c": "Bigues de fusta tractada per a la rampa", "b": 900, "v": 0.21, "p": 13},
+{"id": "n86", "f": 1, "i": "jardineria", "cap": "8. Hort", "k": "8.004", "c": "Reblert de sorra fina", "b": 120, "v": 0.21, "p": 13},
+{"id": "n87", "f": 1, "i": "jardineria", "cap": "8. Hort", "k": "8.004", "c": "Jardineres amb rocs", "b": 800, "v": 0.21, "p": 13},
+{"id": "n88", "f": 1, "i": "paleta", "cap": "9. Sistema de dipòsits i reomplert de piscina", "k": "9.001", "c": "Rasa per a pas de tubs", "b": 1350, "v": 0.21, "p": 14},
+{"id": "n89", "f": 1, "i": "paleta", "cap": "9. Sistema de dipòsits i reomplert de piscina", "k": "9.001", "c": "Reblert de rasa", "b": 2250, "v": 0.21, "p": 14},
+{"id": "n90", "f": 1, "i": "electricista", "cap": "9. Sistema de dipòsits i reomplert de piscina", "k": "9.001", "c": "Tubs de PVC per a aigües pluvials", "b": 900, "v": 0.21, "p": 14},
+{"id": "n91", "f": 1, "i": "electricista", "cap": "9. Sistema de dipòsits i reomplert de piscina", "k": "9.002", "c": "Filtre de sorra per a aigua pluvial", "b": 1500, "v": 0.21, "p": 14},
+{"id": "n92", "f": 1, "i": "paleta", "cap": "9. Sistema de dipòsits i reomplert de piscina", "k": "9.002", "c": "Arqueta de registre del filtre", "b": 850, "v": 0.21, "p": 14},
+{"id": "n93", "f": 1, "i": "electricista", "cap": "9. Sistema de dipòsits i reomplert de piscina", "k": "9.002", "c": "Subquadre elèctric", "b": 1400, "v": 0.21, "p": 14},
+{"id": "n94", "f": 1, "i": "diposits", "cap": "9. Sistema de dipòsits i reomplert de piscina", "k": "9.003", "c": "Dipòsits d'aigua (2 u)", "b": 13000, "v": 0.21, "p": 15},
+{"id": "n95", "f": 1, "i": "diposits", "cap": "9. Sistema de dipòsits i reomplert de piscina", "k": "9.003", "c": "Llit de graves per als dipòsits", "b": 1000, "v": 0.21, "p": 15},
+{"id": "n96", "f": 1, "i": "diposits", "cap": "9. Sistema de dipòsits i reomplert de piscina", "k": "9.003", "c": "Grups de bombeig integrats (2 u)", "b": 3000, "v": 0.21, "p": 15},
+{"id": "n97", "f": 1, "i": "paleta", "cap": "9. Sistema de dipòsits i reomplert de piscina", "k": "9.004", "c": "Forats de drenatge al vas de la piscina", "b": 1000, "v": 0.21, "p": 15},
+{"id": "n98", "f": 1, "i": "paleta", "cap": "9. Sistema de dipòsits i reomplert de piscina", "k": "9.004", "c": "Reblert del vas de la piscina amb grava", "b": 6750, "v": 0.21, "p": 15},
+{"id": "n99", "f": 1, "i": "jardineria", "cap": "9. Sistema de dipòsits i reomplert de piscina", "k": "9.005", "c": "Reblert de terra vegetal", "b": 160, "v": 0.21, "p": 15},
+{"id": "n100", "f": 1, "i": "jardineria", "cap": "9. Sistema de dipòsits i reomplert de piscina", "k": "9.005", "c": "Gespa natural", "b": 3150, "v": 0.21, "p": 15},
+{"id": "n101", "f": 1, "i": "paleta", "cap": "10. Urbanització d'espais exteriors", "k": "10.001", "c": "Excavació per a solera", "b": 2800, "v": 0.21, "p": 16},
+{"id": "n102", "f": 1, "i": "paleta", "cap": "10. Urbanització d'espais exteriors", "k": "10.001", "c": "Solera de formigó", "b": 7000, "v": 0.21, "p": 16},
+{"id": "n103", "f": 1, "i": "electricista", "cap": "10. Urbanització d'espais exteriors", "k": "10.002", "c": "Instal·lació elèctrica d'il·luminació exterior", "b": 4250, "v": 0.21, "p": 16},
+{"id": "n104", "f": 1, "i": "electricista", "cap": "10. Urbanització d'espais exteriors", "k": "10.002", "c": "Aplics encastats al paviment (170 u)", "b": 7650, "v": 0.21, "p": 16},
+{"id": "n105", "f": 1, "i": "paleta", "cap": "10. Urbanització d'espais exteriors", "k": "10.003", "c": "Paviment exterior antilliscant", "b": 7700, "v": 0.21, "p": 16},
+{"id": "n106", "f": 1, "i": "seguretat", "cap": "11. Partides addicionals", "k": "11.001", "c": "Control de qualitat", "b": 1250, "v": 0.21, "p": 17},
+{"id": "n107", "f": 1, "i": "seguretat", "cap": "11. Partides addicionals", "k": "11.002", "c": "Seguretat i salut", "b": 2500, "v": 0.21, "p": 17},
+{"id": "n108", "f": 1, "i": "seguretat", "cap": "11. Partides addicionals", "k": "11.003", "c": "Gestió de residus", "b": 2500, "v": 0.21, "p": 17},
+{"id": "n109", "f": 1, "i": "tecnics", "cap": "12. Estudis tècnics", "k": "12.001", "c": "ICIO · taxa de llicència d'obres", "b": 11500, "v": 0, "p": 18},
+{"id": "n110", "f": 1, "i": "tecnics", "cap": "12. Estudis tècnics", "k": "12.002", "c": "Honoraris de projecte", "b": 7500, "v": 0.21, "p": 18},
+{"id": "n111", "f": 1, "i": "tecnics", "cap": "12. Estudis tècnics", "k": "12.002", "c": "Honoraris de DO, DEO i CSS", "b": 17500, "v": 0.21, "p": 18},
+{"id": "n112", "f": 1, "i": "tecnics", "cap": "12. Estudis tècnics", "k": "12.003", "c": "Estudi geotècnic i topografia", "b": 6000, "v": 0.21, "p": 18},
+{"id": "n113", "f": 1, "i": "tecnics", "cap": "12. Estudis tècnics", "k": "12.004", "c": "Assegurança RC", "b": 400, "v": 0.21, "p": 18},
+{"id": "n114", "f": 1, "i": "contingencies", "cap": "Contingències 10 %", "k": "—", "c": "Contingències 10 % de la fase", "b": 29945.57, "v": 0.21, "p": 18},
+{"id": "n115", "f": 2, "i": "tancaments", "cap": "1. Tancaments", "k": "08.001", "c": "Retirada de porticons de fusta (32 u)", "b": 960, "v": 0.21, "p": 19},
+{"id": "n116", "f": 2, "i": "tancaments", "cap": "1. Tancaments", "k": "08.002", "c": "Retirada de finestres de fusta (14 u)", "b": 840, "v": 0.21, "p": 19},
+{"id": "n117", "f": 2, "i": "tancaments", "cap": "1. Tancaments", "k": "08.002", "c": "Retirada de balconeres de fusta (17 u)", "b": 1360, "v": 0.21, "p": 19},
+{"id": "n118", "f": 2, "i": "tancaments", "cap": "1. Tancaments", "k": "08.002", "c": "Finestres d'alumini amb premarc (48 u)", "b": 31200, "v": 0.21, "p": 19},
+{"id": "n119", "f": 2, "i": "serralleria", "cap": "1. Tancaments", "k": "08.004", "c": "Línia de vida", "b": 1700, "v": 0.21, "p": 19},
+{"id": "n120", "f": 2, "i": "paleta", "cap": "1. Tancaments", "k": "08.004", "c": "Retirada de teules trencades i sanejament", "b": 400, "v": 0.21, "p": 19},
+{"id": "n121", "f": 2, "i": "paleta", "cap": "1. Tancaments", "k": "08.004", "c": "Teules noves", "b": 800, "v": 0.21, "p": 19},
+{"id": "n122", "f": 2, "i": "jardineria", "cap": "2. Zona barbacoa", "k": "10.001", "c": "Poda i neteja de l'espai", "b": 800, "v": 0.21, "p": 20},
+{"id": "n123", "f": 2, "i": "paleta", "cap": "2. Zona barbacoa", "k": "10.001", "c": "Reblert de sorra", "b": 120, "v": 0.21, "p": 20},
+{"id": "n124", "f": 2, "i": "paleta", "cap": "2. Zona barbacoa", "k": "10.002", "c": "Excavació per a solera", "b": 150, "v": 0.21, "p": 20},
+{"id": "n125", "f": 2, "i": "paleta", "cap": "2. Zona barbacoa", "k": "10.002", "c": "Solera de formigó", "b": 540, "v": 0.21, "p": 20},
+{"id": "n126", "f": 2, "i": "serralleria", "cap": "2. Zona barbacoa", "k": "10.002", "c": "Encofrat perdut d'acer corten", "b": 300, "v": 0.21, "p": 20},
+{"id": "n127", "f": 2, "i": "paleta", "cap": "2. Zona barbacoa", "k": "10.003", "c": "Remolinat de morter", "b": 540, "v": 0.21, "p": 21},
+{"id": "n128", "f": 2, "i": "pintura", "cap": "2. Zona barbacoa", "k": "10.003", "c": "Pintat de paret exterior", "b": 156, "v": 0.21, "p": 21},
+{"id": "n129", "f": 2, "i": "paleta", "cap": "2. Zona barbacoa", "k": "10.004", "c": "Cuina exterior d'obra", "b": 3000, "v": 0.21, "p": 21},
+{"id": "n130", "f": 2, "i": "paleta", "cap": "2. Zona barbacoa", "k": "10.004", "c": "Arrebossat de morter de la cuina d'obra", "b": 2400, "v": 0.21, "p": 21},
+{"id": "n131", "f": 2, "i": "fusteria", "cap": "2. Zona barbacoa", "k": "10.004", "c": "Portes de fusta tractada (6 u)", "b": 900, "v": 0.21, "p": 21},
+{"id": "n132", "f": 2, "i": "paleta", "cap": "2. Zona barbacoa", "k": "10.005", "c": "Pas de xemeneia per la coberta", "b": 150, "v": 0.21, "p": 21},
+{"id": "n133", "f": 2, "i": "paleta", "cap": "2. Zona barbacoa", "k": "10.005", "c": "Tir de xemeneia", "b": 500, "v": 0.21, "p": 21},
+{"id": "n134", "f": 2, "i": "paleta", "cap": "2. Zona barbacoa", "k": "10.005", "c": "Barret de xemeneia", "b": 350, "v": 0.21, "p": 21},
+{"id": "n135", "f": 2, "i": "paleta", "cap": "3. Estructura porxada d'esdeveniments", "k": "13.001", "c": "Excavació per a daus de formigó", "b": 300, "v": 0.21, "p": 22},
+{"id": "n136", "f": 2, "i": "paleta", "cap": "3. Estructura porxada d'esdeveniments", "k": "13.001", "c": "Daus de formigó (6 u)", "b": 1200, "v": 0.21, "p": 22},
+{"id": "n137", "f": 2, "i": "serralleria", "cap": "3. Estructura porxada d'esdeveniments", "k": "13.002", "c": "Pletines d'ancoratge (6 u)", "b": 540, "v": 0.21, "p": 22},
+{"id": "n138", "f": 2, "i": "serralleria", "cap": "3. Estructura porxada d'esdeveniments", "k": "13.002", "c": "Pilars d'alumini", "b": 2700, "v": 0.21, "p": 22},
+{"id": "n139", "f": 2, "i": "serralleria", "cap": "3. Estructura porxada d'esdeveniments", "k": "13.002", "c": "Bigues d'alumini", "b": 3150, "v": 0.21, "p": 22},
+{"id": "n140", "f": 2, "i": "jardineria", "cap": "3. Estructura porxada d'esdeveniments", "k": "13.003", "c": "Plantació d'enfiladisses", "b": 1200, "v": 0.21, "p": 22},
+{"id": "n141", "f": 2, "i": "seguretat", "cap": "Partides addicionals", "k": "16.001", "c": "Control de qualitat", "b": 625, "v": 0.21, "p": 23},
+{"id": "n142", "f": 2, "i": "seguretat", "cap": "Partides addicionals", "k": "16.002", "c": "Seguretat i salut", "b": 625, "v": 0.21, "p": 23},
+{"id": "n143", "f": 2, "i": "seguretat", "cap": "Partides addicionals", "k": "16.003", "c": "Gestió de residus", "b": 625, "v": 0.21, "p": 23},
+{"id": "n144", "f": 2, "i": "tecnics", "cap": "Estudis tècnics", "k": "12.001", "c": "ICIO · taxa de llicència d'obres", "b": 2500, "v": 0, "p": 24},
+{"id": "n145", "f": 2, "i": "tecnics", "cap": "Estudis tècnics", "k": "12.002", "c": "Honoraris de projecte", "b": 1500, "v": 0.21, "p": 24},
+{"id": "n146", "f": 2, "i": "tecnics", "cap": "Estudis tècnics", "k": "12.002", "c": "Honoraris de DO, DEO i CSS", "b": 4500, "v": 0.21, "p": 24},
+{"id": "n147", "f": 2, "i": "tecnics", "cap": "Estudis tècnics", "k": "12.003", "c": "Assegurança RC", "b": 200, "v": 0.21, "p": 24},
+{"id": "n148", "f": 2, "i": "contingencies", "cap": "Contingències 10 %", "k": "—", "c": "Contingències 10 % de la fase", "b": 6683.1, "v": 0.21, "p": 24},
+{"id": "n149", "f": 3, "i": "paleta", "cap": "1. Annex de servei", "k": "09.001", "c": "Rasa per a pas d'instal·lacions", "b": 625, "v": 0.21, "p": 25},
+{"id": "n150", "f": 3, "i": "paleta", "cap": "1. Annex de servei", "k": "09.001", "c": "Arquetes de registre (3 u)", "b": 1050, "v": 0.21, "p": 25},
+{"id": "n151", "f": 3, "i": "electricista", "cap": "1. Annex de servei", "k": "09.001", "c": "Tubs corrugats per a l'elèctrica", "b": 125, "v": 0.21, "p": 25},
+{"id": "n152", "f": 3, "i": "electricista", "cap": "1. Annex de servei", "k": "09.002", "c": "Cablejat elèctric d'alimentació", "b": 1500, "v": 0.21, "p": 25},
+{"id": "n153", "f": 3, "i": "electricista", "cap": "1. Annex de servei", "k": "09.002", "c": "Tubs de subministrament d'aigua", "b": 1125, "v": 0.21, "p": 25},
+{"id": "n154", "f": 3, "i": "electricista", "cap": "1. Annex de servei", "k": "09.002", "c": "Sanejament enterrat", "b": 475, "v": 0.21, "p": 25},
+{"id": "n155", "f": 3, "i": "paleta", "cap": "1. Annex de servei", "k": "09.003", "c": "Rebaix del terreny", "b": 550, "v": 0.21, "p": 25},
+{"id": "n156", "f": 3, "i": "paleta", "cap": "1. Annex de servei", "k": "09.003", "c": "Llosa", "b": 2420, "v": 0.21, "p": 25},
+{"id": "n157", "f": 3, "i": "paleta", "cap": "1. Annex de servei", "k": "09.003", "c": "Passos d'instal·lacions", "b": 125, "v": 0.21, "p": 25},
+{"id": "n158", "f": 3, "i": "paleta", "cap": "1. Annex de servei", "k": "09.004", "c": "Paret de càrrega de gero", "b": 4800, "v": 0.21, "p": 26},
+{"id": "n159", "f": 3, "i": "paleta", "cap": "1. Annex de servei", "k": "09.004", "c": "Llindes de porta i finestra", "b": 300, "v": 0.21, "p": 26},
+{"id": "n160", "f": 3, "i": "paleta", "cap": "1. Annex de servei", "k": "09.005", "c": "Forjat col·laborant amb pendent", "b": 4500, "v": 0.21, "p": 26},
+{"id": "n161", "f": 3, "i": "paleta", "cap": "1. Annex de servei", "k": "09.005", "c": "Impermeabilització amb tela asfàltica", "b": 2400, "v": 0.21, "p": 26},
+{"id": "n162", "f": 3, "i": "paleta", "cap": "1. Annex de servei", "k": "09.005", "c": "Acabat de coberta", "b": 600, "v": 0.21, "p": 26},
+{"id": "n163", "f": 3, "i": "electricista", "cap": "1. Annex de servei", "k": "09.005", "c": "Subquadre elèctric", "b": 900, "v": 0.21, "p": 26},
+{"id": "n164", "f": 3, "i": "clima", "cap": "1. Annex de servei", "k": "09.005", "c": "Extracció forçada", "b": 1600, "v": 0.21, "p": 26},
+{"id": "n165", "f": 3, "i": "electricista", "cap": "1. Annex de servei", "k": "09.005", "c": "Escalfador instantani d'aigua", "b": 1200, "v": 0.21, "p": 26},
+{"id": "n166", "f": 3, "i": "electricista", "cap": "1. Annex de servei", "k": "09.005", "c": "Enllumenat (12 u)", "b": 960, "v": 0.21, "p": 26},
+{"id": "n167", "f": 3, "i": "electricista", "cap": "1. Annex de servei", "k": "09.005", "c": "Sanitaris (4 u)", "b": 600, "v": 0.21, "p": 26},
+{"id": "n168", "f": 3, "i": "electricista", "cap": "1. Annex de servei", "k": "09.005", "c": "Griferies (2 u)", "b": 240, "v": 0.21, "p": 26},
+{"id": "n169", "f": 3, "i": "paleta", "cap": "1. Annex de servei", "k": "09.006", "c": "Paviment", "b": 480, "v": 0.21, "p": 26},
+{"id": "n170", "f": 3, "i": "paleta", "cap": "1. Annex de servei", "k": "09.006", "c": "Paret de fàbrica de formigó", "b": 1020, "v": 0.21, "p": 26},
+{"id": "n171", "f": 3, "i": "paleta", "cap": "1. Annex de servei", "k": "09.006", "c": "Fals sostre de cartró guix", "b": 360, "v": 0.21, "p": 26},
+{"id": "n172", "f": 3, "i": "pintura", "cap": "1. Annex de servei", "k": "09.006", "c": "Pintat de sostres", "b": 64, "v": 0.21, "p": 26},
+{"id": "n173", "f": 3, "i": "paleta", "cap": "1. Annex de servei", "k": "09.006", "c": "Enrajolat de parets", "b": 2160, "v": 0.21, "p": 26},
+{"id": "n174", "f": 3, "i": "mobiliari", "cap": "1. Annex de servei", "k": "09.007", "c": "Taulell de bany i accessoris", "b": 1500, "v": 0.21, "p": 26},
+{"id": "n175", "f": 3, "i": "solar", "cap": "2. Instal·lació de plaques solars", "k": "15.001", "c": "Sistema de plaques solars domèstic", "b": 30000, "v": 0.21, "p": 27},
+{"id": "n176", "f": 3, "i": "paleta", "cap": "2. Instal·lació de plaques solars", "k": "15.002", "c": "Paret de fàbrica de formigó (sala d'inversors)", "b": 1000, "v": 0.21, "p": 27},
+{"id": "n177", "f": 3, "i": "serralleria", "cap": "2. Instal·lació de plaques solars", "k": "15.002", "c": "Porta metàl·lica (sala d'inversors)", "b": 400, "v": 0.21, "p": 27},
+{"id": "n178", "f": 3, "i": "electricista", "cap": "2. Instal·lació de plaques solars", "k": "15.002", "c": "Modificació de l'encesa de llums", "b": 450, "v": 0.21, "p": 27},
+{"id": "n179", "f": 3, "i": "clima", "cap": "2. Instal·lació de plaques solars", "k": "15.003", "c": "Clima tipus split amb unitat exterior", "b": 2500, "v": 0.21, "p": 27},
+{"id": "n180", "f": 3, "i": "seguretat", "cap": "Partides addicionals", "k": "16.001", "c": "Control de qualitat", "b": 625, "v": 0.21, "p": 28},
+{"id": "n181", "f": 3, "i": "seguretat", "cap": "Partides addicionals", "k": "16.002", "c": "Seguretat i salut", "b": 625, "v": 0.21, "p": 28},
+{"id": "n182", "f": 3, "i": "seguretat", "cap": "Partides addicionals", "k": "16.003", "c": "Gestió de residus", "b": 625, "v": 0.21, "p": 28},
+{"id": "n183", "f": 3, "i": "tecnics", "cap": "Estudis tècnics", "k": "12.001", "c": "ICIO · taxa de llicència d'obres", "b": 3000, "v": 0, "p": 29},
+{"id": "n184", "f": 3, "i": "tecnics", "cap": "Estudis tècnics", "k": "12.002", "c": "Honoraris de projecte", "b": 2000, "v": 0.21, "p": 29},
+{"id": "n185", "f": 3, "i": "tecnics", "cap": "Estudis tècnics", "k": "12.002", "c": "Honoraris de DO, DEO i CSS", "b": 4000, "v": 0.21, "p": 29},
+{"id": "n186", "f": 3, "i": "tecnics", "cap": "Estudis tècnics", "k": "12.003", "c": "Assegurança RC", "b": 200, "v": 0.21, "p": 29},
+{"id": "n187", "f": 3, "i": "contingencies", "cap": "Contingències 10 %", "k": "—", "c": "Contingències 10 % de la fase", "b": 7710.4, "v": 0.21, "p": 29}
+];/*NEXXO-FI*/
+
+/* Previsió i factura real, per id de línia de Nexxo: { "n12": 1234.56, ... } — imports SENSE IVA (l'IVA s'afegeix al tancament) */
+const PREVISIONS = {};
+const FACTURES = {};
+
+/* Cada partida: { id, fase, ind, concepte, base, iva, nexxo, previsio, factura, font }
+   Files SENSE IVA, com el document. El tancament (contingències, total obra, IVA, total costos) va al peu. */
+const IVA_GENERAL = 0.21;
+const CONTINGENCIES = {};   // per fase, sense IVA
+NEXXO.filter(l => l.i === "contingencies").forEach(l => CONTINGENCIES[l.f] = (CONTINGENCIES[l.f]||0) + l.b);
+const PARTIDES = NEXXO.filter(l => l.i !== "contingencies").map(l => ({
+  id: l.id, fase: l.f, ind: l.i, concepte: l.c, base: l.b, iva: l.v,
+  nexxo: l.b,
+  previsio: PREVISIONS[l.id] ?? null,
+  factura: FACTURES[l.id] ?? null,
+  font: `${l.k !== "—" ? l.k + " · " : ""}${l.cap} · pàg. ${l.p}${l.v === 0 ? " · sense IVA" : ""}`,
+}));
+
+/* ===== Càlcul i pintat ===== */
+const eur = n => new Intl.NumberFormat("ca-ES",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(n);
+const eur2 = n => new Intl.NumberFormat("ca-ES",{style:"currency",currency:"EUR",minimumFractionDigits:2}).format(n);
+const pct = n => (n>0?"+":"") + new Intl.NumberFormat("ca-ES",{maximumFractionDigits:1}).format(n) + " %";
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fcol = f => `var(--f${f})`;
+
+function suma(list){
+  let nx=0, rf=0, nxComp=0, pend=0, n=list.length, nr=0, pv=0, np=0;
+  for(const p of list){
+    nx += p.nexxo||0;
+    if(p.previsio!=null){ pv += p.previsio; np++; }
+    if(p.factura==null){ pend += p.nexxo||0; }
+    else { rf += p.factura; nxComp += p.nexxo||0; nr++; }
+  }
+  const dv = rf - nxComp;
+  return { nx, rf, nxComp, pend, n, nr, dv, pv, np, dvPct: nxComp ? dv/nxComp*100 : null };
+}
+
+/* Tancament com al document: obra + contingències = total obra; + IVA = total costos */
+function tancament(list, fases){
+  const s = suma(list);
+  const cont = fases.reduce((a,f)=>a+(CONTINGENCIES[f]||0),0);
+  let ivNx = cont*IVA_GENERAL, ivPv = 0, ivRf = 0;
+  for(const p of list){
+    ivNx += (p.nexxo||0)*p.iva;
+    if(p.previsio!=null) ivPv += p.previsio*p.iva;
+    if(p.factura!=null)  ivRf += p.factura*p.iva;
+  }
+  return { s, cont,
+    obra: { nx: s.nx+cont, pv: s.pv, rf: s.rf },
+    iva:  { nx: ivNx, pv: ivPv, rf: ivRf },
+    cost: { nx: s.nx+cont+ivNx, pv: s.pv+ivPv, rf: s.rf+ivRf } };
+}
+
+function cellDv(s){
+  if(!s.nr) return `<span class="zero">—</span>`;
+  const cls = s.dv>0 ? "over" : s.dv<0 ? "under" : "";
+  const fletxa = s.dv>0 ? "▲ " : s.dv<0 ? "▼ " : "";
+  const w = s.dvPct==null ? 0 : Math.min(Math.abs(s.dvPct),50);
+  const bar = s.dv ? `<span class="${s.dv>0?"o":"u"}" style="width:${w}%"></span>` : "";
+  return `<div class="dv"><div class="dv-txt ${cls}"><b>${fletxa}${eur(s.dv)}</b><small>${s.dvPct==null?"":pct(s.dvPct)}</small></div><div class="track" aria-hidden="true">${bar}</div></div>`;
+}
+function cellPv(s){
+  if(!s.n) return `<span class="zero">—</span>`;
+  if(!s.np) return `<span class="zero">—</span>`;
+  return `<div class="pv"><b>${eur(s.pv)}</b>${s.np<s.n?`<small>${s.np} de ${s.n} partides</small>`:""}</div>`;
+}
+const cellNum = (v, buit) => buit ? `<span class="zero">—</span>` : `<span class="num">${eur(v)}</span>`;
+
+let filtre = 0;
+const oberts = new Set();
+try{ filtre = +(localStorage.getItem("rnx-filtre")||0) }catch(e){}
+
+function render(){
+  const tot = suma(PARTIDES);
+  const T = tancament(PARTIDES, FASES.map(f=>f.id));
+  document.getElementById("buit").hidden = PARTIDES.length>0;
+  document.getElementById("k-nx").textContent = eur2(T.cost.nx);
+  const dif = PROJECTE.nexxoTotalDoc ? Math.round((T.cost.nx - PROJECTE.nexxoTotalDoc)*100)/100 : null;
+  document.getElementById("k-nx-n").innerHTML = `${tot.n} partide${tot.n===1?"":"s"}` + (dif==null||!tot.n ? "" :
+    dif===0 ? ` · <span class="ok">✓ quadra amb el document (${eur2(PROJECTE.nexxoTotalDoc)})</span>` : ` · <span class="ko">✗ ${eur2(dif)} respecte al document</span>`);
+  document.getElementById("k-rf").textContent = eur(T.cost.rf);
+  document.getElementById("k-rf-n").textContent = `${tot.nr} de ${tot.n} partides facturades` + (tot.pend? ` · ${eur(tot.pend)} pendents` : "");
+  const kdv = document.getElementById("k-dv");
+  kdv.className = "val " + (tot.dv>0?"over":tot.dv<0?"under":"");
+  kdv.textContent = tot.nr ? `${tot.dv>0?"+":""}${eur(tot.dv)}` : "—";
+  document.getElementById("k-pv").textContent = eur(T.cost.pv);
+  document.getElementById("k-pv-n").textContent = tot.np ? `${tot.np} de ${tot.n} partides amb previsió` : "Xifra que fixem nosaltres per a cada partida";
+  document.getElementById("k-dv-n").textContent = tot.nr && tot.dvPct!=null ? `${pct(tot.dvPct)} sobre ${eur(tot.nxComp)} comparables, sense IVA` : "Sobre les partides que tenen les dues xifres, sense IVA";
+
+  if(PROJECTE.nom) document.getElementById("titol").textContent = PROJECTE.nom;
+  const sub = [];
+  if(PROJECTE.nexxoDoc) sub.push(`Nexxo: <b>${esc(PROJECTE.nexxoDoc)}</b>`);
+  if(PROJECTE.facturaDocs.length) sub.push(`Factures: <b>${PROJECTE.facturaDocs.map(esc).join(", ")}</b>`);
+  if(sub.length) document.getElementById("subtitol").innerHTML = sub.join(" · ");
+
+  document.querySelectorAll("#filtre button").forEach(b=>b.setAttribute("aria-pressed", +b.dataset.f===filtre));
+
+  const maxInd = Math.max(1, ...FASES.flatMap(f=>INDUSTRIALS.map(i=>{
+    const s=suma(PARTIDES.filter(p=>p.fase===f.id&&p.ind===i.id)); return Math.max(s.nx,s.rf);})));
+
+  let h = "";
+  for(const f of FASES){
+    if(filtre && f.id!==filtre) continue;
+    const pf = PARTIDES.filter(p=>p.fase===f.id);
+    const sf = suma(pf);
+    h += `<tr class="fase"><td><div class="fname"><i style="background:${fcol(f.id)}"></i>${f.nom}${f.desc?` <small>${esc(f.desc)}</small>`:""}</div></td>
+      <td class="num">${cellNum(sf.nx, !sf.n)}</td><td class="pvc">${cellPv(sf)}</td><td class="num">${cellNum(sf.rf, !sf.nr)}</td><td>${cellDv(sf)}</td></tr>`;
+    for(const ind of INDUSTRIALS){
+      const pi = pf.filter(p=>p.ind===ind.id);
+      if(ind.tipus!=="base" && !pi.length) continue;
+      const s = suma(pi);
+      const key = f.id+"|"+ind.id, obert = oberts.has(key) && pi.length>0;
+      const cmp = s.n ? `<div class="cmp" aria-hidden="true"><div class="n" style="width:${s.nx/maxInd*100}%"></div><div class="r" style="width:${s.rf/maxInd*100}%"></div></div>` : "";
+      h += `<tr class="ind-row" tabindex="0" data-k="${key}" aria-expanded="${obert}">
+        <td><div class="ind-name"><svg class="chev" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>${ind.nom} <span class="cnt">${s.n?`· ${s.n}`:""}</span>${ind.tipus==="cost"?` <span class="pill cost">No industrial</span>`:""}</div>${cmp}</td>
+        <td>${cellNum(s.nx, !s.n)}</td><td class="pvc">${cellPv(s)}</td><td>${cellNum(s.rf, !s.nr)}</td><td>${cellDv(s)}</td></tr>`;
+      if(obert) for(const p of pi){
+        const sp = suma([p]);
+        h += `<tr class="det"><td>${esc(p.concepte)}${p.font?`<span class="src">${esc(p.font)}</span>`:""}</td>
+          <td>${eur(p.nexxo||0)}</td><td class="pvc">${p.previsio==null?`<span class="zero">—</span>`:eur(p.previsio)}</td><td>${p.factura==null?`<span class="pill pend">Pendent</span>`:eur(p.factura)}</td><td>${cellDv(sp)}</td></tr>`;
+      }
+    }
+  }
+  document.getElementById("cos").innerHTML = h;
+
+  const st = filtre ? suma(PARTIDES.filter(p=>p.fase===filtre)) : tot;
+  const TT = tancament(filtre ? PARTIDES.filter(p=>p.fase===filtre) : PARTIDES, filtre ? [filtre] : FASES.map(f=>f.id));
+  const z = `<span class="zero">—</span>`, v2 = (x, hi) => hi ? eur2(x) : z;
+  document.getElementById("peu").innerHTML =
+    `<tr class="t-fases"><td>${filtre?`Total fase ${filtre}`:"Total fases"}</td><td>${eur2(st.nx)}</td><td class="pvc">${cellPv(st)}</td><td>${v2(st.rf, st.nr)}</td><td>${cellDv(st)}</td></tr>
+     <tr class="t-linia"><td>Contingències 10 %</td><td>${eur2(TT.cont)}</td><td class="pvc">${z}</td><td>${z}</td><td></td></tr>
+     <tr class="t-obra"><td>Total obra</td><td>${eur2(TT.obra.nx)}</td><td class="pvc">${v2(TT.obra.pv, st.np)}</td><td>${v2(TT.obra.rf, st.nr)}</td><td></td></tr>
+     <tr class="t-linia"><td>IVA 21 %</td><td>${eur2(TT.iva.nx)}</td><td class="pvc">${v2(TT.iva.pv, st.np)}</td><td>${v2(TT.iva.rf, st.nr)}</td><td></td></tr>
+     <tr class="t-cost"><td>Total costos</td><td>${eur2(TT.cost.nx)}</td><td class="pvc">${v2(TT.cost.pv, st.np)}</td><td>${v2(TT.cost.rf, st.nr)}</td><td></td></tr>`;
+}
+
+document.getElementById("filtre").addEventListener("click", e=>{
+  const b = e.target.closest("button"); if(!b) return;
+  filtre = +b.dataset.f;
+  try{ localStorage.setItem("rnx-filtre", filtre) }catch(e){}
+  render();
+});
+function toggle(row){ const k=row.dataset.k; oberts.has(k)?oberts.delete(k):oberts.add(k); render(); }
+document.getElementById("cos").addEventListener("click", e=>{ const r=e.target.closest(".ind-row"); if(r) toggle(r); });
+document.getElementById("cos").addEventListener("keydown", e=>{ const r=e.target.closest(".ind-row"); if(r && (e.key==="Enter"||e.key===" ")){ e.preventDefault(); toggle(r); const n=document.querySelector(`.ind-row[data-k="${r.dataset.k}"]`); n&&n.focus(); } });
+render();
+</script>
+
+</html>
