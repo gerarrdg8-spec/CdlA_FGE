@@ -104,6 +104,8 @@ tfoot .t-real td.pvc{background:var(--esp-bg)}
 .ent-calc{margin:0;font-size:14px;flex:1 1 260px}
 .ent-err{margin:0;color:var(--over);font-size:14px;font-weight:600}
 .ent-err:empty{display:none}
+.ent-avis{margin:0;font-size:15px;line-height:1.55;max-width:70ch}
+.ent-avis a{color:var(--accent);font-weight:600}
 .ent-llista h3{margin:0 0 8px;font:600 13px/1 var(--display);letter-spacing:.08em;text-transform:uppercase}
 .ent-llista h3 span{color:var(--faint);font-weight:500}
 table.tl{min-width:680px}
@@ -220,7 +222,7 @@ tfoot .t-cost td.pvc{background:var(--line)}
   <div class="wrap">
     <div class="eyebrow">Fundació GironaEst · Quadre de comandament</div>
     <h1 id="titol">Reforma Global Casa de les Arts</h1>
-    <p class="actual" id="actual">Dades actualitzades el 03/10/2026 a les 18:13</p>
+    <p class="actual" id="actual">Dades actualitzades el 03/10/2026 a les 18:16</p>
   </div>
 </header>
 
@@ -265,6 +267,7 @@ tfoot .t-cost td.pvc{background:var(--line)}
       <h2>Entrar dades</h2>
       <button type="button" class="btn-sec" id="ent-tanca">Tanca</button>
     </div>
+    <p class="ent-avis" id="ent-avis" hidden>Aquí només es poden consultar les dades. Per entrar factures, previsions o aportacions, obre el quadre a <b>claude.ai</b> amb el teu compte: <a href="https://claude.ai/artifact/D5UzDUfXqRawnWvPuufHnG" target="_blank" rel="noopener">claude.ai/artifact/D5UzDUfXqRawnWvPuufHnG ↗</a>. Si no el pots obrir, demana a qui el gestiona que te'l comparteixi amb accés de Col·laborador.</p>
     <form id="ent-form" novalidate>
       <div class="seg seg-tipus" role="radiogroup" aria-label="Què entres" id="ent-tipus">
         <button type="button" data-t="factura" aria-pressed="true">Factura real</button>
@@ -299,7 +302,7 @@ tfoot .t-cost td.pvc{background:var(--line)}
   </section>
 
   <div class="bar-row">
-    <button type="button" class="btn" id="ent-obre" hidden>+ Entrar dades</button>
+    <button type="button" class="btn" id="ent-obre">+ Entrar dades</button>
     <div class="seg" role="group" aria-label="Filtra per fase" id="filtre">
       <button type="button" data-f="0" aria-pressed="true">Totes</button>
       <button type="button" data-f="1" aria-pressed="false">Fase 1</button>
@@ -781,7 +784,7 @@ render();
 const TIPUS = { factura:"Factura real", previsio:"Previsió", material:"Material donat", hores:"Hores de voluntariat" };
 const $ = id => document.getElementById(id);
 const num = v => { const t=String(v||"").trim().replace(/\s/g,"").replace(/\.(?=\d{3}(\D|$))/g,"").replace(",","."); const n=parseFloat(t); return isFinite(n)?n:null; };
-let tipus = "factura", DB = null;
+let tipus = "factura", DB = null, potEscriure = null;
 const nomLinia = id => { const l = LINIES.find(x=>x.id===id); return l ? l.c : id; };
 const indNom = id => (INDUSTRIALS.find(i=>i.id===id)||{nom:id}).nom;
 
@@ -876,7 +879,12 @@ $("ent-iva").addEventListener("change", calc);
 $("ent-linia").addEventListener("change", infoLinia);
 ["ent-import","ent-hores","ent-preu"].forEach(id=>$(id).addEventListener("input", calc));
 $("ent-form").addEventListener("submit", desa);
-$("ent-obre").addEventListener("click", ()=>{ $("entrada").hidden=false; $("ent-obre").hidden=true; $("ent-fase").focus(); });
+$("ent-obre").addEventListener("click", ()=>{
+  $("entrada").hidden=false; $("ent-obre").hidden=true;
+  const pot = !!DB && potEscriure !== false;
+  $("ent-avis").hidden = pot; $("ent-form").hidden = !pot; document.querySelector(".ent-llista").hidden = !DB;
+  if(pot) $("ent-fase").focus();
+});
 $("ent-tanca").addEventListener("click", ()=>{ $("entrada").hidden=true; $("ent-obre").hidden=false; });
 
 (async () => {
@@ -889,10 +897,10 @@ $("ent-tanca").addEventListener("click", ()=>{ $("entrada").hidden=true; $("ent-
     ENTRADES = snap.docs.map(d => ({ _id: d.id, ...d.data() })).filter(e => e.tipus==="factura" ? (e.fase && e.ind) : LINIES.some(l=>l.id===e.linia));
     construeix(); render(); pintaLlista(); infoLinia();
   }, () => {});
-  if(pot === false) return;   // només lectura
+  potEscriure = pot;
+  if(!$("entrada").hidden){ $("ent-avis").hidden = pot!==false; $("ent-form").hidden = pot===false; document.querySelector(".ent-llista").hidden = false; }
   $("ent-data").value = new Date().toISOString().slice(0,10);
   omplirFases(); posaTipus("factura"); pintaLlista();
-  $("ent-obre").hidden = false;
 })();
 </script>
 
