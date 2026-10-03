@@ -5,11 +5,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
-/* Layout: banda fosca de capçalera + tres xifres + matriu Fase › Industrial × (Nexxo | Previsió | Factura real | Desviació) */
+/* Layout: capçalera blanca + quatre xifres + franja de fases + tres xifres + matriu Fase › Industrial × (Nexxo | Previsió | Factura real | Desviació) */
 :root{
-  --bg:#f2f4f1; --surface:#ffffff; --surface-2:#f6f8f5; --line:#dce2da; --line-2:#e9ede7;
-  --fg:#17231a; --muted:#56635a; --faint:#838280;
-  --band:#17301C; --band-fg:#eef4ec; --band-muted:#a9bfa9; --band-accent:#93C02C;
+  --bg:#ffffff; --surface:#ffffff; --surface-2:#f6f7f6; --line:#dfe2e0; --line-2:#eceeed;
+  --fg:#1c2420; --muted:#5a625e; --faint:#838280;
+  --band:#ffffff; --band-fg:#1c2420; --band-muted:#5a625e; --band-accent:#1E7A2F;
   --accent:#1E7A2F;          /* factura real (ple) — verd de la Fundació */
   --nexxo:#838280;           /* avantprojecte Nexxo (contorn) — gris del logotip */
   --over:#b4362c; --over-bg:#fbe9e7;    /* desviació a l'alça */
@@ -36,16 +36,15 @@
 
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--body);font-variant-numeric:tabular-nums}
-.band{background:var(--band);color:var(--band-fg);padding:22px 16px 26px}
+.band{background:var(--band);color:var(--band-fg);padding-block:26px 20px}
 .wrap{max-width:1180px;margin:0 auto;padding-inline:16px}
-.band .wrap{padding-inline:0}
 .eyebrow{font:600 11px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--band-accent)}
 h1{font:700 clamp(24px,3.4vw,34px)/1.1 var(--display);margin:8px 0 6px;text-wrap:balance;letter-spacing:-.01em}
 .sub{color:var(--band-muted);margin:0;font-size:14px}
 .sub b{color:var(--band-fg);font-weight:600}
 .sublink{color:inherit;text-decoration:underline;text-decoration-color:var(--band-accent);text-underline-offset:3px}
 
-.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:-18px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:4px}
 .kpi{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:16px 18px 14px;display:flex;flex-direction:column;gap:6px;min-width:0}
 .kpi .lab{display:flex;align-items:center;gap:8px;font:600 12px/1 var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .kpi .doc{margin-left:auto;font:600 11px/1 var(--body);letter-spacing:.04em;color:var(--accent);text-decoration:none;border:1px solid currentColor;border-radius:3px;padding:4px 6px}
@@ -60,6 +59,19 @@ h1{font:700 clamp(24px,3.4vw,34px)/1.1 var(--display);margin:8px 0 6px;text-wrap
 .sw.dv{background:linear-gradient(90deg,var(--under) 50%,var(--over) 50%)}
 .val.over{color:var(--over)} .val.under{color:var(--under)}
 
+.repart{margin-top:22px;display:flex;flex-direction:column;gap:10px}
+.repart-cap{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px}
+.repart-cap h2{margin:0;font:600 13px/1 var(--display);letter-spacing:.08em;text-transform:uppercase}
+.repart-cap span{font-size:13px;color:var(--muted)}
+.repart-bar{display:flex;height:16px;border-radius:3px;overflow:hidden;gap:2px;background:var(--line-2)}
+.repart-bar button{border:0;padding:0;cursor:pointer;min-width:4px}
+.repart-bar button:focus-visible{outline:2px solid var(--fg);outline-offset:1px}
+.repart-llista{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.rp{display:flex;flex-direction:column;gap:2px;padding-left:12px;border-left:4px solid}
+.rp b{font:700 20px/1.2 var(--display)}
+.rp span{font-size:13px;color:var(--muted)}
+.rp em{font-style:normal;font:600 14px var(--display)}
+@media (max-width:560px){.repart-llista{grid-template-columns:1fr}}
 .bar-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin:26px 0 12px}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:4px;overflow:hidden;background:var(--surface)}
 .seg button{font:600 13px/1 var(--body);color:var(--muted);background:transparent;border:0;padding:9px 14px;cursor:pointer}
@@ -80,7 +92,7 @@ th:first-child,td:first-child{text-align:left}
 thead th{font:600 12px/1.2 var(--display);letter-spacing:.07em;text-transform:uppercase;color:var(--muted);background:var(--surface-2);border-bottom:1px solid var(--line);position:sticky;top:0;white-space:nowrap}
 thead th .hd{display:inline-flex;align-items:center;gap:7px}
 col.c-ind{width:24%} col.c-nx,col.c-rf{width:16%} col.c-dv{width:24%} col.c-pv{width:20%}
-td.pvc,th.pvc{background:color-mix(in srgb,var(--accent) 6%,transparent);border-left:1px solid var(--line);border-right:1px solid var(--line)}
+td.pvc,th.pvc{background:color-mix(in srgb,var(--nexxo) 7%,transparent);border-left:1px solid var(--line);border-right:1px solid var(--line)}
 .pv{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
 .pv b{font-weight:600}
 .pv small{font-size:11.5px;color:var(--muted)}
@@ -150,7 +162,7 @@ tfoot .t-cost td.pvc{background:var(--line)}
 
 @media (max-width:980px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:560px){
-  .kpis{grid-template-columns:1fr;margin-top:-14px}
+  .kpis{grid-template-columns:1fr}
 }
 @media (prefers-reduced-motion:reduce){.chev{transition:none}}
 </style>
@@ -159,7 +171,6 @@ tfoot .t-cost td.pvc{background:var(--line)}
   <div class="wrap">
     <div class="eyebrow">Fundació GironaEst · Quadre de comandament</div>
     <h1 id="titol">Reforma Global Casa de les Arts</h1>
-    <p class="sub" id="subtitol">Sense documents carregats encara. Primer pas: <b>avantprojecte de Nexxo</b>.</p>
   </div>
 </header>
 
@@ -168,7 +179,7 @@ tfoot .t-cost td.pvc{background:var(--line)}
     <div class="kpi">
       <div class="lab"><span class="sw nx"></span>Avantprojecte Nexxo <a class="doc" id="k-nx-doc" href="docs/Nexxo-CdlA-pre-estudi-costos-fases.pdf" target="_blank" rel="noopener" title="Obre el document de Nexxo (PDF)">PDF ↗</a></div>
       <div class="val" id="k-nx">0 €</div>
-      <div class="note" id="k-nx-n">0 partides</div>
+      <div class="note">Total costos amb IVA</div>
     </div>
     <div class="kpi">
       <div class="lab"><span class="sw pv"></span>Previsió</div>
@@ -185,6 +196,12 @@ tfoot .t-cost td.pvc{background:var(--line)}
       <div class="val" id="k-dv">—</div>
       <div class="note" id="k-dv-n">Sobre les partides que tenen les dues xifres</div>
     </div>
+  </section>
+
+  <section class="repart" aria-label="Repartiment per fases">
+    <div class="repart-cap"><h2>Repartiment per fases</h2><span>Avantprojecte Nexxo, sense IVA ni contingències</span></div>
+    <div class="repart-bar" id="repart-bar"></div>
+    <div class="repart-llista" id="repart-llista"></div>
   </section>
 
   <div class="bar-row">
@@ -509,6 +526,14 @@ function tancament(list, fases){
     cost: { nx: s.nx+cont+ivNx, pv: s.pv+ivPv, rf: s.rf+ivRf } };
 }
 
+function renderRepart(){
+  const fs = FASES.map(f=>({f, nx: suma(PARTIDES.filter(p=>p.fase===f.id)).nx}));
+  const tot = fs.reduce((a,x)=>a+x.nx,0) || 1;
+  const pc = x => new Intl.NumberFormat("ca-ES",{maximumFractionDigits:1}).format(x/tot*100)+" %";
+  document.getElementById("repart-bar").innerHTML = fs.map(x=>`<button type="button" data-f="${x.f.id}" style="flex:${x.nx} 0 0;background:${fcol(x.f.id)}" title="${x.f.nom}: ${eur(x.nx)} (${pc(x.nx)}) — filtra"></button>`).join("");
+  document.getElementById("repart-llista").innerHTML = fs.map(x=>`<div class="rp" style="border-color:${fcol(x.f.id)}"><em>${x.f.nom}</em><b>${eur(x.nx)}</b><span>${pc(x.nx)} de l'obra</span></div>`).join("");
+}
+
 function cellDv(s){
   if(!s.nr) return `<span class="zero">—</span>`;
   const cls = s.dv>0 ? "over" : s.dv<0 ? "under" : "";
@@ -534,9 +559,7 @@ function render(){
   const T = tancament(PARTIDES, FASES.map(f=>f.id));
   document.getElementById("buit").hidden = PARTIDES.length>0;
   document.getElementById("k-nx").textContent = eur2(T.cost.nx);
-  const dif = PROJECTE.nexxoTotalDoc ? Math.round((T.cost.nx - PROJECTE.nexxoTotalDoc)*100)/100 : null;
-  document.getElementById("k-nx-n").innerHTML = `${tot.n} partide${tot.n===1?"":"s"}` + (dif==null||!tot.n ? "" :
-    dif===0 ? ` · <span class="ok">✓ quadra amb el document (${eur2(PROJECTE.nexxoTotalDoc)})</span>` : ` · <span class="ko">✗ ${eur2(dif)} respecte al document</span>`);
+  renderRepart();
   document.getElementById("k-rf").textContent = eur(T.cost.rf);
   document.getElementById("k-rf-n").textContent = `${tot.nr} de ${tot.n} partides facturades` + (tot.pend? ` · ${eur(tot.pend)} pendents` : "");
   const kdv = document.getElementById("k-dv");
@@ -547,10 +570,6 @@ function render(){
   document.getElementById("k-dv-n").textContent = tot.nr && tot.dvPct!=null ? `${pct(tot.dvPct)} sobre ${eur(tot.nxComp)} comparables, sense IVA` : "Sobre les partides que tenen les dues xifres, sense IVA";
 
   if(PROJECTE.nom) document.getElementById("titol").textContent = PROJECTE.nom;
-  const sub = [];
-  if(PROJECTE.nexxoDoc) sub.push(`Nexxo: <a class="sublink" href="docs/Nexxo-CdlA-pre-estudi-costos-fases.pdf" target="_blank" rel="noopener"><b>${esc(PROJECTE.nexxoDoc)}</b> ↗</a>`);
-  if(PROJECTE.facturaDocs.length) sub.push(`Factures: <b>${PROJECTE.facturaDocs.map(esc).join(", ")}</b>`);
-  if(sub.length) document.getElementById("subtitol").innerHTML = sub.join(" · ");
 
   document.querySelectorAll("#filtre button").forEach(b=>b.setAttribute("aria-pressed", +b.dataset.f===filtre));
 
@@ -595,6 +614,12 @@ function render(){
      <tr class="t-cost"><td>Total costos</td><td>${eur2(TT.cost.nx)}</td><td class="pvc">${v2(TT.cost.pv, st.np)}</td><td>${v2(TT.cost.rf, st.nr)}</td><td></td></tr>`;
 }
 
+document.getElementById("repart-bar").addEventListener("click", e=>{
+  const b = e.target.closest("button"); if(!b) return;
+  filtre = filtre===+b.dataset.f ? 0 : +b.dataset.f;
+  try{ localStorage.setItem("rnx-filtre", filtre) }catch(e){}
+  render();
+});
 document.getElementById("filtre").addEventListener("click", e=>{
   const b = e.target.closest("button"); if(!b) return;
   filtre = +b.dataset.f;
