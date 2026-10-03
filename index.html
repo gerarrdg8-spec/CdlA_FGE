@@ -15,6 +15,7 @@
   --over:#b4362c; --over-bg:#fbe9e7;    /* desviació a l'alça */
   --under:#00699A; --under-bg:#e3f0f7;  /* per sota: blau, perquè el verd ja és la marca */
   --pend:#8a6a12; --pend-bg:#fbf3dc;
+  --esp:#7a4fa0; --esp-bg:#f5f0fa;   /* aportacions en espècie */
   --f1:#1E7A2F; --f2:#00699A; --f3:#B45F2B;
   --display:"IBM Plex Sans Condensed","IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
   --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -24,14 +25,14 @@
   --fg:#e6efe5; --muted:#a3b3a5; --faint:#8a9a8c;
   --band:#080F09; --band-fg:#eef4ec; --band-muted:#93a995; --band-accent:#A9D147;
   --accent:#57C06A; --nexxo:#a3a29f;
-  --over:#f08a7e; --over-bg:#3a1f1c; --under:#5E8FE8; --under-bg:#16243a; --pend:#e2c06a; --pend-bg:#33290f;
+  --over:#f08a7e; --over-bg:#3a1f1c; --under:#5E8FE8; --under-bg:#16243a; --pend:#e2c06a; --pend-bg:#33290f; --esp:#c3a3e6; --esp-bg:#271d33;
   --f1:#57C06A; --f2:#5E8FE8; --f3:#D07F45; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0e1510; --surface:#152018; --surface-2:#1a271d; --line:#2a3a2d; --line-2:#213024;
   --fg:#e6efe5; --muted:#a3b3a5; --faint:#8a9a8c;
   --band:#080F09; --band-fg:#eef4ec; --band-muted:#93a995; --band-accent:#A9D147;
   --accent:#57C06A; --nexxo:#a3a29f;
-  --over:#f08a7e; --over-bg:#3a1f1c; --under:#5E8FE8; --under-bg:#16243a; --pend:#e2c06a; --pend-bg:#33290f;
+  --over:#f08a7e; --over-bg:#3a1f1c; --under:#5E8FE8; --under-bg:#16243a; --pend:#e2c06a; --pend-bg:#33290f; --esp:#c3a3e6; --esp-bg:#271d33;
   --f1:#57C06A; --f2:#5E8FE8; --f3:#D07F45; color-scheme:dark}
 
 *{box-sizing:border-box}
@@ -44,7 +45,7 @@ h1{font:700 clamp(24px,3.4vw,34px)/1.1 var(--display);margin:8px 0 6px;text-wrap
 .sub b{color:var(--band-fg);font-weight:600}
 .sublink{color:inherit;text-decoration:underline;text-decoration-color:var(--band-accent);text-underline-offset:3px}
 
-.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:4px}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-top:4px}
 .kpi{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:16px 18px 14px;display:flex;flex-direction:column;gap:6px;min-width:0}
 .kpi .lab{display:flex;align-items:center;gap:8px;font:600 12px/1 var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .kpi .doc{margin-left:auto;font:600 11px/1 var(--body);letter-spacing:.04em;color:var(--accent);text-decoration:none;border:1px solid currentColor;border-radius:3px;padding:4px 6px}
@@ -56,6 +57,18 @@ h1{font:700 clamp(24px,3.4vw,34px)/1.1 var(--display);margin:8px 0 6px;text-wrap
 .sw.nx{border:2px solid var(--nexxo);background:transparent}
 .sw.rf{background:var(--accent)}
 .sw.pv{background:transparent;border:2px dashed var(--accent)}
+.sw.es{background:repeating-linear-gradient(135deg,var(--esp) 0 2px,transparent 2px 4px);border:1.5px solid var(--esp)}
+.kpi-esp{border-color:var(--esp);background:var(--esp-bg)}
+.esbar{display:flex;height:6px;border-radius:3px;overflow:hidden;gap:2px}
+.esbar .m{background:var(--esp)} .esbar .h{background:color-mix(in srgb,var(--esp) 45%,transparent)}
+.esp{display:block;font-size:12px;color:var(--esp);font-weight:600;margin-top:2px}
+.pill.mat{background:var(--esp-bg);color:var(--esp);border:1px solid color-mix(in srgb,var(--esp) 40%,transparent)}
+.pill.vol{background:var(--esp-bg);color:var(--esp);border:1px dashed var(--esp)}
+.mostra{background:var(--pend-bg);color:var(--fg);border:1px solid color-mix(in srgb,var(--pend) 40%,transparent);border-radius:4px;padding:10px 14px;font-size:14px;margin-top:4px}
+.mostra b{color:var(--pend)}
+tfoot .t-esp td{border-top:1px solid var(--line-2);color:var(--esp);font-weight:600}
+tfoot .t-real td{background:var(--esp-bg);font:700 17px var(--display);border-bottom:2px solid var(--esp)}
+tfoot .t-real td.pvc{background:var(--esp-bg)}
 .sw.dv{background:linear-gradient(90deg,var(--under) 50%,var(--over) 50%)}
 .val.over{color:var(--over)} .val.under{color:var(--under)}
 
@@ -196,6 +209,12 @@ tfoot .t-cost td.pvc{background:var(--line)}
       <div class="val" id="k-dv">—</div>
       <div class="note" id="k-dv-n">Sobre les partides que tenen les dues xifres</div>
     </div>
+    <div class="kpi kpi-esp">
+      <div class="lab"><span class="sw es"></span>Aportacions en espècie</div>
+      <div class="val" id="k-es">0 €</div>
+      <div class="esbar" id="k-es-bar" aria-hidden="true"></div>
+      <div class="note" id="k-es-n"></div>
+    </div>
   </section>
 
   <section class="repart" aria-label="Repartiment per fases">
@@ -245,6 +264,7 @@ tfoot .t-cost td.pvc{background:var(--line)}
     <div class="clau-item">
       <h3><span class="sw dv"></span>Desviació</h3>
       <p class="formula">Factura real − Nexxo</p>
+      <p>Les partides amb aportació en espècie no es comparen.</p>
       <p><span class="over">▲ vermell</span> quan la factura supera el previst · <span class="under">▼ blau</span> quan queda per sota.</p>
     </div>
     <div class="clau-item">
@@ -477,6 +497,12 @@ const INDUSTRIALS = [
 /* Previsió i factura real, per id de línia de Nexxo: { "n12": 1234.56, ... } — imports SENSE IVA (l'IVA s'afegeix al tancament) */
 const PREVISIONS = {};
 const FACTURES = {};
+/* Aportacions en espècie (sense IVA): material donat al seu valor de mercat, o hores de voluntariat × preu/hora */
+const ESPECIE = {
+  /* n12: { tipus: "material", valor: 1500, qui: "Empresa X", nota: "Què s'ha donat", doc: "albarà / certificat" },
+     n34: { tipus: "hores", hores: 20, preuHora: 20, qui: "Voluntaris", nota: "Tasca", doc: "full d'hores" } */
+};
+const valorEsp = e => e ? (e.tipus === "hores" ? e.hores * e.preuHora : e.valor) : 0;
 
 /* Cada partida: { id, fase, ind, concepte, base, iva, nexxo, previsio, factura, font }
    Files SENSE IVA, com el document. El tancament (contingències, total obra, IVA, total costos) va al peu. */
@@ -488,6 +514,7 @@ const PARTIDES = NEXXO.filter(l => l.i !== "contingencies").map(l => ({
   nexxo: l.b,
   previsio: PREVISIONS[l.id] ?? null,
   factura: FACTURES[l.id] ?? null,
+  esp: ESPECIE[l.id] || null,
   font: `${l.k !== "—" ? l.k + " · " : ""}${l.cap} · pàg. ${l.p}${l.v === 0 ? " · sense IVA" : ""}`,
 }));
 
@@ -499,15 +526,16 @@ const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&g
 const fcol = f => `var(--f${f})`;
 
 function suma(list){
-  let nx=0, rf=0, nxComp=0, pend=0, n=list.length, nr=0, pv=0, np=0;
+  let nx=0, rf=0, rfComp=0, nxComp=0, pend=0, n=list.length, nr=0, nc=0, pv=0, np=0, es=0, esMat=0, esHores=0, hores=0, ne=0;
   for(const p of list){
     nx += p.nexxo||0;
     if(p.previsio!=null){ pv += p.previsio; np++; }
+    if(p.esp){ const v=valorEsp(p.esp); es+=v; ne++; if(p.esp.tipus==="hores"){ esHores+=v; hores+=p.esp.hores; } else esMat+=v; }
     if(p.factura==null){ pend += p.nexxo||0; }
-    else { rf += p.factura; nxComp += p.nexxo||0; nr++; }
+    else { rf += p.factura; nr++; if(!p.esp){ rfComp += p.factura; nxComp += p.nexxo||0; nc++; } }
   }
-  const dv = rf - nxComp;
-  return { nx, rf, nxComp, pend, n, nr, dv, pv, np, dvPct: nxComp ? dv/nxComp*100 : null };
+  const dv = rfComp - nxComp;   // les partides amb aportació en espècie no es comparen
+  return { nx, rf, nxComp, pend, n, nr: nc, nfac: nr, dv, pv, np, es, esMat, esHores, hores, ne, dvPct: nxComp ? dv/nxComp*100 : null };
 }
 
 /* Tancament com al document: obra + contingències = total obra; + IVA = total costos */
@@ -560,8 +588,11 @@ function render(){
   document.getElementById("buit").hidden = PARTIDES.length>0;
   document.getElementById("k-nx").textContent = eur2(T.cost.nx);
   renderRepart();
+  document.getElementById("k-es").textContent = eur(tot.es);
+  document.getElementById("k-es-bar").innerHTML = tot.es ? `<span class="m" style="flex:${tot.esMat}"></span><span class="h" style="flex:${tot.esHores}"></span>` : "";
+  document.getElementById("k-es-n").innerHTML = tot.ne ? `Material ${eur(tot.esMat)} · Voluntariat ${eur(tot.esHores)} (${tot.hores} h)<br>Sense IVA · no entren a la desviació` : "Material donat i hores de voluntariat, valorats sense IVA";
   document.getElementById("k-rf").textContent = eur(T.cost.rf);
-  document.getElementById("k-rf-n").textContent = `${tot.nr} de ${tot.n} partides facturades` + (tot.pend? ` · ${eur(tot.pend)} pendents` : "");
+  document.getElementById("k-rf-n").textContent = `${tot.nfac} de ${tot.n} partides facturades` + (tot.pend? ` · ${eur(tot.pend)} pendents` : "");
   const kdv = document.getElementById("k-dv");
   kdv.className = "val " + (tot.dv>0?"over":tot.dv<0?"under":"");
   kdv.textContent = tot.nr ? `${tot.dv>0?"+":""}${eur(tot.dv)}` : "—";
@@ -593,11 +624,11 @@ function render(){
       const cmp = s.n ? `<div class="cmp" aria-hidden="true"><div class="n" style="width:${s.nx/maxInd*100}%"></div><div class="r" style="width:${s.rf/maxInd*100}%"></div></div>` : "";
       h += `<tr class="ind-row" tabindex="0" data-k="${key}" aria-expanded="${obert}">
         <td><div class="ind-name"><svg class="chev" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>${ind.nom} <span class="cnt">${s.n?`· ${s.n}`:""}</span>${ind.tipus==="cost"?` <span class="pill cost">No industrial</span>`:""}</div>${cmp}</td>
-        <td>${cellNum(s.nx, !s.n)}</td><td class="pvc">${cellPv(s)}</td><td>${cellNum(s.rf, !s.nr)}</td><td>${cellDv(s)}</td></tr>`;
+        <td>${cellNum(s.nx, !s.n)}</td><td class="pvc">${cellPv(s)}</td><td>${cellNum(s.rf, !s.nfac)}${s.es?`<span class="esp">+ ${eur(s.es)} en espècie</span>`:""}</td><td>${cellDv(s)}</td></tr>`;
       if(obert) for(const p of pi){
         const sp = suma([p]);
         h += `<tr class="det"><td>${esc(p.concepte)}${p.font?`<span class="src">${esc(p.font)}</span>`:""}</td>
-          <td>${eur(p.nexxo||0)}</td><td class="pvc">${p.previsio==null?`<span class="zero">—</span>`:eur(p.previsio)}</td><td>${p.factura==null?`<span class="pill pend">Pendent</span>`:eur(p.factura)}</td><td>${cellDv(sp)}</td></tr>`;
+          <td>${eur(p.nexxo||0)}</td><td class="pvc">${p.previsio==null?`<span class="zero">—</span>`:eur(p.previsio)}</td><td>${p.factura==null?`<span class="pill pend">Pendent</span>`:eur(p.factura)}${p.esp?`<span class="esp">+ ${eur(valorEsp(p.esp))} ${p.esp.tipus==="hores"?`<span class="pill vol">Voluntariat · ${p.esp.hores} h × ${p.esp.preuHora} €</span>`:`<span class="pill mat">Material donat</span>`}</span><span class="src">${esc(p.esp.qui)} · ${esc(p.esp.nota)}</span>`:""}</td><td>${p.esp?`<span class="zero" title="Té aportació en espècie: no es compara">no es compara</span>`:cellDv(sp)}</td></tr>`;
       }
     }
   }
@@ -607,11 +638,13 @@ function render(){
   const TT = tancament(filtre ? PARTIDES.filter(p=>p.fase===filtre) : PARTIDES, filtre ? [filtre] : FASES.map(f=>f.id));
   const z = `<span class="zero">—</span>`, v2 = (x, hi) => hi ? eur2(x) : z;
   document.getElementById("peu").innerHTML =
-    `<tr class="t-fases"><td>${filtre?`Total fase ${filtre}`:"Total fases"}</td><td>${eur2(st.nx)}</td><td class="pvc">${cellPv(st)}</td><td>${v2(st.rf, st.nr)}</td><td>${cellDv(st)}</td></tr>
+    `<tr class="t-fases"><td>${filtre?`Total fase ${filtre}`:"Total fases"}</td><td>${eur2(st.nx)}</td><td class="pvc">${cellPv(st)}</td><td>${v2(st.rf, st.nfac)}</td><td>${cellDv(st)}</td></tr>
      <tr class="t-linia"><td>Contingències 10 %</td><td>${eur2(TT.cont)}</td><td class="pvc">${z}</td><td>${z}</td><td></td></tr>
-     <tr class="t-obra"><td>Total obra</td><td>${eur2(TT.obra.nx)}</td><td class="pvc">${v2(TT.obra.pv, st.np)}</td><td>${v2(TT.obra.rf, st.nr)}</td><td></td></tr>
-     <tr class="t-linia"><td>IVA 21 %</td><td>${eur2(TT.iva.nx)}</td><td class="pvc">${v2(TT.iva.pv, st.np)}</td><td>${v2(TT.iva.rf, st.nr)}</td><td></td></tr>
-     <tr class="t-cost"><td>Total costos</td><td>${eur2(TT.cost.nx)}</td><td class="pvc">${v2(TT.cost.pv, st.np)}</td><td>${v2(TT.cost.rf, st.nr)}</td><td></td></tr>`;
+     <tr class="t-obra"><td>Total obra</td><td>${eur2(TT.obra.nx)}</td><td class="pvc">${v2(TT.obra.pv, st.np)}</td><td>${v2(TT.obra.rf, st.nfac)}</td><td></td></tr>
+     <tr class="t-linia"><td>IVA 21 %</td><td>${eur2(TT.iva.nx)}</td><td class="pvc">${v2(TT.iva.pv, st.np)}</td><td>${v2(TT.iva.rf, st.nfac)}</td><td></td></tr>
+     <tr class="t-cost"><td>Total costos · pagat per la Fundació</td><td>${eur2(TT.cost.nx)}</td><td class="pvc">${v2(TT.cost.pv, st.np)}</td><td>${v2(TT.cost.rf, st.nfac)}</td><td></td></tr>
+     <tr class="t-esp"><td>Aportacions en espècie</td><td>${z}</td><td class="pvc">${z}</td><td>${v2(st.es, st.ne)}</td><td></td></tr>
+     <tr class="t-real"><td>Cost real de l'obra</td><td>${z}</td><td class="pvc">${z}</td><td>${v2(TT.cost.rf + st.es, st.nfac||st.ne)}</td><td></td></tr>`;
 }
 
 document.getElementById("repart-bar").addEventListener("click", e=>{
